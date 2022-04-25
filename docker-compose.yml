@@ -1,0 +1,12 @@
+version : '3'
+services:
+  mysql:
+    container_name: mysql-container
+    build: 
+      context: .
+      dockerfile: ./api/db/Dockerfile
+    volumes:
+       - "./api/db/data:/var/lib/mysql"
+       - "./api/db/scripts:/docker-entrypoint-initdb.d"
+    ports:
+       - 3306:3306
