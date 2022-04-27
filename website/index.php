@@ -7,7 +7,7 @@
 </head>
 <body>
   <?php
-    $result = file_get_contents("http://node-container:9001/people");
+    $result = file_get_contents("http://api:9001/people");
     $people = json_decode($result);
   ?>
   

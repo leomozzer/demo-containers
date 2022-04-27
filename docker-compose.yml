@@ -23,3 +23,16 @@ services:
     restart: "always"
     depends_on:
       - "mysql"
+
+  website:
+    container_name: website-container
+    build: 
+      context: .
+      dockerfile: ./website/Dockerfile
+    volumes:
+       - "./website:/var/www/html"
+    ports:
+       - 8888:80
+    restart: "always"
+    depends_on:
+      - "api"
