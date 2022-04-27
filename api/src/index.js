@@ -4,7 +4,7 @@ const mysql = require('mysql2');
 const app = express();
 
 const connection = mysql.createConnection({
-  host: 'mysql-container',
+  host: 'mysql',
   user: 'root',
   password: 'skaylink',
   database: 'skaylinkbr'

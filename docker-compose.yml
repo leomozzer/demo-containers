@@ -10,3 +10,16 @@ services:
        - "./api/db/scripts:/docker-entrypoint-initdb.d"
     ports:
        - 3306:3306
+
+  api:
+    container_name: api-container
+    build: 
+      context: .
+      dockerfile: ./api/Dockerfile
+    volumes:
+       - "./api:/home/node/app"
+    ports:
+       - 9001:9001
+    restart: "always"
+    depends_on:
+      - "mysql"
