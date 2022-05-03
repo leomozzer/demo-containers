@@ -35,7 +35,7 @@ stages:
       - task: Docker@2
         inputs:
           containerRegistry: ${{ parameters.containerRegistry }}
-          repository: 'api'
+          repository: 'mysql'
           command: 'buildAndPush'
           Dockerfile: '$(System.DefaultWorkingDirectory)/api/db/Dockerfile'
           tags: 'latest'
@@ -43,7 +43,7 @@ stages:
       - task: Docker@2
         inputs:
           containerRegistry: ${{ parameters.containerRegistry }}
-          repository: 'api'
+          repository: 'website'
           command: 'buildAndPush'
           Dockerfile: '$(System.DefaultWorkingDirectory)/website/Dockerfile'
           tags: 'latest'

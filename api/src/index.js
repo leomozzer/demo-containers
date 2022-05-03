@@ -12,26 +12,26 @@ const connection = mysql.createConnection({
 
 connection.connect();
 
-app.get('/people', function(req, res) {
-  connection.query('SELECT * FROM people', function (error, results) {    
+app.get('/people', function (req, res) {
+  connection.query('SELECT * FROM people', function (error, results) {
 
-    if (error) { 
+    if (error) {
       throw error
     };
     console.log(results);
     res.send(
-      results.map(item => ({ 
-          name: item.full_name, 
-          email: item.email, 
-          title: item.title, 
-          location: item.location_name 
-        })
+      results.map(item => ({
+        name: item.full_name,
+        email: item.email,
+        title: item.title,
+        location: item.location_name
+      })
       )
     );
   });
 });
 
 
-app.listen(9001, '0.0.0.0', function() {
+app.listen(9001, '0.0.0.0', function () {
   console.log('Listening on port 9001');
 })
