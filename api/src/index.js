@@ -3,6 +3,10 @@ const mysql = require('mysql2');
 
 const app = express();
 
+app.get('/', (req, res) => {
+  return res.send('Hello World!')
+})
+
 const connection = mysql.createConnection({
   host: 'mysql',
   user: 'root',
