@@ -1,0 +1,27 @@
+parameters:
+  - name: file_name
+  - name: artifact_name  
+  - name: storage_account_name
+  - name: container_name
+
+jobs:
+  - job: 'DownloadFile'
+    pool:
+      vmImage: ubuntu-latest
+
+    steps:
+      - task: AzureCLI@2
+        displayName: 'Storage Account Download'
+        inputs:
+          workingDirectory: '$(System.ArtifactsDirectory)/${{ parameters.artifact_name }}'
+          azureSubscription: 'AzureDevOps'
+          scriptType: 'pscore'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            az storage blob download --account-name ${{ parameters.storage_account_name }} --container-name ${{ parameters.container_name }} --name ${{ parameters.file_name }} --file ${{ parameters.file_name }} --auth-mode key
+
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifacts'
+        inputs:
+          pathToPublish: '$(Build.ArtifactStagingDirectory)/${{ parameters.artifact_name }}'
+          artifactName: ${{ parameters.artifact_name }}
