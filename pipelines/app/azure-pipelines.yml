@@ -1,0 +1,49 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - main
+  paths:
+    exclude: 
+    - README.md
+    - LICENSE
+    include:
+    - api
+    - website
+
+parameters:
+  - name: containerRegistry
+    default: "AzureACR"
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: main
+    jobs:
+    - job: BuildAndPush
+      steps:
+
+      - task: Docker@2
+        inputs:
+          containerRegistry: ${{ parameters.containerRegistry }}
+          repository: 'api'
+          command: 'buildAndPush'
+          Dockerfile: '$(System.DefaultWorkingDirectory)/api/Dockerfile'
+          tags: 'latest'
+
+      - task: Docker@2
+        inputs:
+          containerRegistry: ${{ parameters.containerRegistry }}
+          repository: 'api'
+          command: 'buildAndPush'
+          Dockerfile: '$(System.DefaultWorkingDirectory)/api/db/Dockerfile'
+          tags: 'latest'
+
+      - task: Docker@2
+        inputs:
+          containerRegistry: ${{ parameters.containerRegistry }}
+          repository: 'api'
+          command: 'buildAndPush'
+          Dockerfile: '$(System.DefaultWorkingDirectory)/website/Dockerfile'
+          tags: 'latest'

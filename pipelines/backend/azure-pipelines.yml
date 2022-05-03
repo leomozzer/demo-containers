@@ -1,0 +1,55 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - main
+  paths:
+    exclude: 
+    - README.md
+    - LICENSE
+    include:
+    - terraform/backend
+    - pipelines/backend/azure-pipelines.yml
+
+parameters:
+  - name: backendDir
+    default: "terraform/backend"
+  - name: app_name
+    default: "demo-containers"
+
+variables:
+  - group: "demo-containers-group"
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: main
+    jobs:
+
+    - template: ../templates/storage-account/download.yml
+      parameters:        
+        file_name: 'terraform.tfstate'
+        artifact_name: 'tfstates'
+        storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
+        container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
+        
+    - template: ../templates/terraform.yml
+      parameters:
+        out_file: "main"
+        input_vars:  '-var "app_name=${{ parameters.app_name }}" -var "subscription_id=$(SUBSCRIPTION-ID)" -var "client_id=$(CLIENT-ID)" -var "client_secret=$(CLIENT-SECRET)" -var "tenant_id=$(TENANT-ID)"'
+        include_root_rolder: true
+        work_dir: ${{ parameters.backendDir }}
+        archive_type: 'tar'
+        output_file: 'tf-backend'
+        artifact_name: 'tfstates'
+        depends_on: 'DownloadFile'
+
+    - template: ../templates/storage-account/upload.yml
+      parameters:
+        depends_on: 'Terraform'
+        output_file: 'tf-backend.tar'
+        file_name: 'terraform.tfstate'
+        artifact_name: 'tfstates'
+        storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
+        container_name: '$(STORAGE-ACCOUNT-CONTAINER)'

@@ -1,0 +1,32 @@
+parameters:
+  - name: artifact_name
+  - name: output_file
+  - name: file_name
+  - name: depends_on
+    default: []
+  - name: storage_account_name
+  - name: container_name
+
+jobs:
+  - job: 'SaveFile'
+    dependsOn: ${{ parameters.depends_on }}
+    condition: always()
+    pool:
+      vmImage: ubuntu-latest
+
+    steps:
+      - task: DownloadBuildArtifacts@0
+        inputs:
+          buildType: 'current'
+          downloadType: 'single'
+          artifactName: ${{ parameters.artifact_name }}
+          downloadPath: '$(System.ArtifactsDirectory)'
+          
+      - task: AzureCLI@2
+        inputs:
+          workingDirectory: '$(System.ArtifactsDirectory)/${{ parameters.artifact_name }}'
+          azureSubscription: 'AzureDevOps'
+          scriptType: 'pscore'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            az storage blob upload --account-name ${{ parameters.storage_account_name }} --container-name ${{ parameters.container_name }} --name ${{ parameters.file_name }} --file ${{ parameters.file_name }} --auth-mode key --overwrite
