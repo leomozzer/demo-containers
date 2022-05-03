@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "test",
-    "start": "nodemon ./src/index"
+    "start": "node ./src/index"
   },
   "keywords": [
     "Docker"
