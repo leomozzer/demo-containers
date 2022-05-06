@@ -102,4 +102,7 @@ terraform apply -auto-approve main.plan
 * Get the credentials of the ACR
 * Use the command `docker login myregistry.azurecr.io` and provide the username and password
 * Run the command `docker build . -t myregistry.azurecr.io/api`
-* Run the command `docker push zndwlghacr.azurecr.io/api`
+* Run the command `docker push myregistry.azurecr.io/api`
+
+## Docker Compose and Azure
+* [Deploy a multi-container group using Docker Compose](https://docs.microsoft.*com/en-us/azure/container-instances/tutorial-docker-compose)

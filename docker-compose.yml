@@ -1,6 +1,7 @@
 version : '3'
 services:
   mysql:
+    image: uzubwttacr.azurecr.io/mysql
     container_name: mysql-container
     build: 
       context: .
@@ -12,6 +13,7 @@ services:
        - 3306:3306
 
   api:
+    image: uzubwttacr.azurecr.io/api
     container_name: api-container
     build: 
       context: .
@@ -25,6 +27,7 @@ services:
       - "mysql"
 
   website:
+    image: uzubwttacr.azurecr.io/website
     container_name: website-container
     build: 
       context: .
@@ -36,3 +39,10 @@ services:
     restart: "always"
     depends_on:
       - "api"
+
+volumes:
+    hi:
+      driver: azure_file
+      driver_opts:
+          share_name: <name of share>
+          storage_account_name: <name of storage account>

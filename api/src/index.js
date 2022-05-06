@@ -9,33 +9,33 @@ app.get('/', (req, res) => {
   return res.send(`Hello World! ${Date()}`)
 })
 
-// const connection = mysql.createConnection({
-//   host: 'mysql',
-//   user: 'root',
-//   password: 'skaylink',
-//   database: 'skaylinkbr'
-// });
+const connection = mysql.createConnection({
+  host: 'mysql',
+  user: 'root',
+  password: 'skaylink',
+  database: 'skaylinkbr'
+});
 
-// connection.connect();
+connection.connect();
 
-// app.get('/people', function (req, res) {
-//   connection.query('SELECT * FROM people', function (error, results) {
+app.get('/people', function (req, res) {
+  connection.query('SELECT * FROM people', function (error, results) {
 
-//     if (error) {
-//       throw error
-//     };
-//     console.log(results);
-//     res.send(
-//       results.map(item => ({
-//         name: item.full_name,
-//         email: item.email,
-//         title: item.title,
-//         location: item.location_name
-//       })
-//       )
-//     );
-//   });
-// });
+    if (error) {
+      throw error
+    };
+    console.log(results);
+    res.send(
+      results.map(item => ({
+        name: item.full_name,
+        email: item.email,
+        title: item.title,
+        location: item.location_name
+      })
+      )
+    );
+  });
+});
 
 
 app.listen(PORT, '0.0.0.0', function () {
