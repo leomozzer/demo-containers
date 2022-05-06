@@ -1,7 +1,7 @@
 FROM node:latest
 
 # Create app directory
-WORKDIR /home/node/api
+WORKDIR /home/node/app
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
@@ -16,4 +16,5 @@ RUN npm install
 COPY . .
 
 #EXPOSE 8080
-CMD [ "node", "src/index.js" ]
+#CMD [ "node", "src/index.js" ]
+CMD npm start

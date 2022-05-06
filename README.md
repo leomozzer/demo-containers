@@ -76,3 +76,30 @@ docker-compose up
 ...
 docker-compose down
 ```
+-----------------------------------------------------------
+## Terraform
+
+### Backend
+* Add the values below in the file `terraform.tfvars`
+```
+subscription_id = ""
+client_id       = ""
+client_secret   = ""
+tenant_id       = ""
+```
+* Use the commands below:
+```
+terraform init
+terraform plan -var-file="terraform.tfvars" -out=main.plan
+terraform apply -auto-approve main.plan
+```
+
+
+## Azure
+
+### api
+* Use the terraform/backend to create the Azure Container Registry (ACR)
+* Get the credentials of the ACR
+* Use the command `docker login myregistry.azurecr.io` and provide the username and password
+* Run the command `docker build . -t myregistry.azurecr.io/api`
+* Run the command `docker push zndwlghacr.azurecr.io/api`
