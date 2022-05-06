@@ -3,7 +3,7 @@
 .terraform
 
 #Files
-#terraform.tfvars
+terraform.tfvars
 .terraform.lock.hcl
 terraform.tfstate.backup
 terraform.tfstate
