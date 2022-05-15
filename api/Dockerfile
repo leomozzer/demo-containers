@@ -20,6 +20,7 @@
 # CMD npm start
 FROM node:latest
 WORKDIR /home/node/app
-COPY package*.json ./
-RUN npm install -y --global nodemon
+COPY package.json ./
+RUN npm install
+COPY . .
 CMD npm start

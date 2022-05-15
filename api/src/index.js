@@ -3,6 +3,12 @@ const mysql = require('mysql2');
 
 const app = express();
 
+app.use(express.json())
+app.use(express.urlencoded({ 'extended': true }))
+app.use((req, res, next) => {
+  next();
+})
+
 const PORT = 9001 //change to 9001 when sending all the project
 
 app.get('/', (req, res) => {
@@ -38,6 +44,6 @@ app.get('/people', function (req, res) {
 });
 
 
-app.listen(PORT, '0.0.0.0', function () {
+app.listen(PORT, function () {
   console.log(`Listening on port ${PORT}`);
 })
