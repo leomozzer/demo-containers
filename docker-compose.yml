@@ -1,23 +1,23 @@
 version : '3'
 services:
   mysql:
-    image: uzubwttacr.azurecr.io/mysql
+    image: <acrName>.azurecr.io/mysql
     container_name: mysql-container
     build: 
-      context: .
-      dockerfile: ./api/db/Dockerfile
+      context: ./db
+      dockerfile: Dockerfile
     volumes:
-       - "./api/db/data:/var/lib/mysql"
-       - "./api/db/scripts:/docker-entrypoint-initdb.d"
+       - "./db/data:/var/lib/mysql"
+       - "./db/scripts:/docker-entrypoint-initdb.d"
     ports:
        - 3306:3306
 
   api:
-    image: uzubwttacr.azurecr.io/api
+    image: <acrName>.azurecr.io/api
     container_name: api-container
     build: 
-      context: .
-      dockerfile: ./api/Dockerfile
+      context: ./api
+      dockerfile: Dockerfile
     volumes:
        - "./api:/home/node/app"
     ports:
@@ -27,11 +27,11 @@ services:
       - "mysql"
 
   website:
-    image: uzubwttacr.azurecr.io/website
+    image: <acrName>.azurecr.io/website
     container_name: website-container
     build: 
-      context: .
-      dockerfile: ./website/Dockerfile
+      context: ./website
+      dockerfile: Dockerfile
     volumes:
        - "./website:/var/www/html"
     ports:
@@ -39,10 +39,3 @@ services:
     restart: "always"
     depends_on:
       - "api"
-
-volumes:
-    hi:
-      driver: azure_file
-      driver_opts:
-          share_name: <name of share>
-          storage_account_name: <name of storage account>
