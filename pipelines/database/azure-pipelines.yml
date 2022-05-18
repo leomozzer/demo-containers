@@ -17,7 +17,7 @@ parameters:
   - name: azureContainerRegistry
     default: wttohsfacr.azurecr.io
   - name: azureSubscriptionEndpoint
-    default: AzureACR
+    default: AzureDevOps
 
 pool:
   vmImage: ubuntu-latest
