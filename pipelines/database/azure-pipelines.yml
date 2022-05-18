@@ -29,6 +29,16 @@ stages:
       steps:
 
       - task: DockerCompose@0
+        displayName: Build services
+        inputs:
+          action: Build services
+          azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
+          azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
+          dockerComposeFile: db/docker-compose.yml
+          projectName: mysql
+          qualifyImageNames: true
+
+      - task: DockerCompose@0
         displayName: Push services
         inputs:
           action: Push services
