@@ -12,8 +12,16 @@ trigger:
     - website
 
 parameters:
-  - name: containerRegistry
-    default: "AzureACR"
+  - name: azureContainerRegistry
+    default: wttohsfacr.azurecr.io
+  - name: azureSubscriptionEndpoint
+    default: AzureDevOps
+  - name: dockerComposeFile
+    default: api/docker-compose.yml
+  - name: projectName
+    default: api
+  - name: qualifyImageNames
+    default: true
 
 pool:
   vmImage: ubuntu-latest
@@ -24,26 +32,50 @@ stages:
     - job: BuildAndPush
       steps:
 
-      - task: Docker@2
+      - task: DockerCompose@0
+        displayName: Build services
         inputs:
-          containerRegistry: ${{ parameters.containerRegistry }}
-          repository: 'api'
-          command: 'buildAndPush'
-          Dockerfile: '$(System.DefaultWorkingDirectory)/api/Dockerfile'
-          tags: 'latest'
+          action: Build services
+          azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
+          azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
+          dockerComposeFile: ${{ parameters.dockerComposeFile }}
+          projectName: ${{ parameters.azureContainerRegistry }}
+          qualifyImageNames: ${{ parameters.qualifyImageNames }}
+          dockerComposeFileArgs: |
+            MYSQL_HOST="20.123.233.107"
+            MYSQL_PORT=3306
+          
+      - task: DockerCompose@0
+        displayName: Push services
+        inputs:
+          action: Push services
+          containerregistrytype: Azure Container Registry
+          azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
+          azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
+          dockerComposeFile: ${{ parameters.dockerComposeFile }}
+          projectName: ${{ parameters.projectName }}
+          qualifyImageNames: ${{ parameters.qualifyImageNames }}
 
-      - task: Docker@2
-        inputs:
-          containerRegistry: ${{ parameters.containerRegistry }}
-          repository: 'mysql'
-          command: 'buildAndPush'
-          Dockerfile: '$(System.DefaultWorkingDirectory)/api/db/Dockerfile'
-          tags: 'latest'
+      # - task: Docker@2
+      #   inputs:
+      #     containerRegistry: ${{ parameters.containerRegistry }}
+      #     repository: 'api'
+      #     command: 'buildAndPush'
+      #     Dockerfile: '$(System.DefaultWorkingDirectory)/api/Dockerfile'
+      #     tags: 'latest'
 
-      - task: Docker@2
-        inputs:
-          containerRegistry: ${{ parameters.containerRegistry }}
-          repository: 'website'
-          command: 'buildAndPush'
-          Dockerfile: '$(System.DefaultWorkingDirectory)/website/Dockerfile'
-          tags: 'latest'
+      # - task: Docker@2
+      #   inputs:
+      #     containerRegistry: ${{ parameters.containerRegistry }}
+      #     repository: 'mysql'
+      #     command: 'buildAndPush'
+      #     Dockerfile: '$(System.DefaultWorkingDirectory)/api/db/Dockerfile'
+      #     tags: 'latest'
+
+      # - task: Docker@2
+      #   inputs:
+      #     containerRegistry: ${{ parameters.containerRegistry }}
+      #     repository: 'website'
+      #     command: 'buildAndPush'
+      #     Dockerfile: '$(System.DefaultWorkingDirectory)/website/Dockerfile'
+      #     tags: 'latest'

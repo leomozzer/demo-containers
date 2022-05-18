@@ -102,7 +102,7 @@ terraform apply -auto-approve main.plan
 * Get the credentials of the ACR
 * Use the command `docker login <acrName>.azurecr.io` and provide the username and password
 
-## Docker Compose and Azure
+## Docker Compose and Azure Manually
 * [Deploy a multi-container group using Docker Compose](https://docs.microsoft.com/en-us/azure/container-instances/tutorial-docker-compose)
 * az acr login --name <acrName>
 * docker-compose up --build -d
@@ -123,3 +123,6 @@ terraform apply -auto-approve main.plan
 * docker-compose push
 
 * https://docs.microsoft.com/pt-br/azure/app-service/tutorial-multi-container-app
+
+## Docker Compose and Azure Pipeline
+
