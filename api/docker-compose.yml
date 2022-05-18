@@ -1,7 +1,7 @@
 version : '3'
 services:
   api:
-    image: <acrName>.azurecr.io/api
+    image: api
     container_name: api-container
     build: 
       context: .
