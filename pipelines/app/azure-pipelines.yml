@@ -14,7 +14,7 @@ trigger:
 
 parameters:
   - name: azureContainerRegistry
-    default: wttohsfacr.azurecr.io
+    default: ufjmmjtacr.azurecr.io
   - name: azureSubscriptionEndpoint
     default: AzureDevOps
   - name: dockerComposeFile
