@@ -34,7 +34,7 @@ stages:
           action: Push services
           containerregistrytype: Azure Container Registry
           azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
-          azureContainerRegistry: ${{ parameters.azureSubscriptionEndpoint }}
+          azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
           dockerComposeFile: db/docker-compose.yml
           projectName: mysql
           qualifyImageNames: true
