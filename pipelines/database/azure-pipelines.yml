@@ -11,6 +11,7 @@ trigger:
     - website
     include:
     - db
+    - pipelines/database/azure-pipelines.yml
 
 parameters:
   - name: azureContainerRegistry
