@@ -29,8 +29,16 @@ pool:
 
 stages:
   - stage: main
-    jobs:
-    - job: BuildAndPush
+    - template: ../templates/docker-compose/build-push.yml
+        parameters:        
+          azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
+          azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
+          dockerComposeFile: db/docker-compose.yml
+          projectName: mysql
+          qualifyImageNames: true
+          jobName: MySqlDockerCompose
+
+    - job: NodeJSDockerCompose
       steps:
 
       - task: DockerCompose@0
@@ -43,7 +51,7 @@ stages:
           projectName: ${{ parameters.azureContainerRegistry }}
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
           dockerComposeFileArgs: |
-            MYSQL_HOST="20.123.233.107"
+            MYSQL_HOST=""
             MYSQL_PORT=3306
           
       - task: DockerCompose@0

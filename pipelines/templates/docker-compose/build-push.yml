@@ -4,9 +4,10 @@ parameters:
   - name: dockerComposeFile
   - name: projectName
   - name: qualifyImageNames
+  - name: jobName
 
 jobs:
-  - job: 'DockerCompose'
+  - job: ${{ parameters.jobName }}
     pool:
       vmImage: ubuntu-latest
     steps:

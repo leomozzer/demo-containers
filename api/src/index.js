@@ -12,7 +12,10 @@ app.use((req, res, next) => {
 const PORT = 9001 //change to 9001 when sending all the project
 
 app.get('/', (req, res) => {
-  return res.send(`Hello World! ${Date()}`)
+  return res.json({
+    "message": `Hello World! ${Date()}`,
+    "host": process.env.MYSQL_HOST
+  })
 })
 
 // const connection = mysql.createConnection({
@@ -45,6 +48,6 @@ app.get('/', (req, res) => {
 // });
 
 
-app.listen(PORT, function () {
+app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
 })
