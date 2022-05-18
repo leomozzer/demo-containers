@@ -25,9 +25,6 @@ pool:
 stages:
   - stage: main
     jobs:
-    - job: DockerComposeMySql
-      steps:
-
       - template: ../templates/docker-compose/build.yml
         parameters:        
           azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
@@ -36,16 +33,16 @@ stages:
           projectName: mysql
           qualifyImageNames: true
 
-      - task: DockerCompose@0
-        displayName: Push services
-        inputs:
-          action: Push services
-          containerregistrytype: Azure Container Registry
-          azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
-          azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
-          dockerComposeFile: db/docker-compose.yml
-          projectName: mysql
-          qualifyImageNames: true
+      # - task: DockerCompose@0
+      #   displayName: Push services
+      #   inputs:
+      #     action: Push services
+      #     containerregistrytype: Azure Container Registry
+      #     azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
+      #     azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
+      #     dockerComposeFile: db/docker-compose.yml
+      #     projectName: mysql
+      #     qualifyImageNames: true
 
       # - task: Docker@2
       #   inputs:
