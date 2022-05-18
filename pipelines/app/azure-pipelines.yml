@@ -30,13 +30,13 @@ pool:
 stages:
   - stage: main
     - template: ../templates/docker-compose/build-push.yml
-        parameters:        
-          azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
-          azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
-          dockerComposeFile: db/docker-compose.yml
-          projectName: mysql
-          qualifyImageNames: true
-          jobName: MySqlDockerCompose
+      parameters:        
+        azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
+        azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
+        dockerComposeFile: db/docker-compose.yml
+        projectName: mysql
+        qualifyImageNames: true
+        jobName: MySqlDockerCompose
 
     - job: NodeJSDockerCompose
       steps:
