@@ -4,7 +4,7 @@ services:
     image: wttohsfacr.azurecr.io/mysql
     container_name: mysql-container
     build: 
-      context: ./db
+      context: .
       dockerfile: Dockerfile
     volumes:
        - "./db/data:/var/lib/mysql"
