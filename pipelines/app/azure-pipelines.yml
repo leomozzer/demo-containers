@@ -55,6 +55,9 @@ stages:
           dockerComposeFile: ${{ parameters.dockerComposeFile }}
           projectName: ${{ parameters.projectName }}
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
+          dockerComposeFileArgs: |
+            MYSQL_HOST="20.123.233.107"
+            MYSQL_PORT=3306
 
       # - task: Docker@2
       #   inputs:
