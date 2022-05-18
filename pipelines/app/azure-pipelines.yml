@@ -10,6 +10,7 @@ trigger:
     include:
     - api
     - website
+    - pipelines/app/azure-pipelines.yml
 
 parameters:
   - name: azureContainerRegistry
@@ -58,27 +59,3 @@ stages:
           dockerComposeFileArgs: |
             MYSQL_HOST="20.123.233.107"
             MYSQL_PORT=3306
-
-      # - task: Docker@2
-      #   inputs:
-      #     containerRegistry: ${{ parameters.containerRegistry }}
-      #     repository: 'api'
-      #     command: 'buildAndPush'
-      #     Dockerfile: '$(System.DefaultWorkingDirectory)/api/Dockerfile'
-      #     tags: 'latest'
-
-      # - task: Docker@2
-      #   inputs:
-      #     containerRegistry: ${{ parameters.containerRegistry }}
-      #     repository: 'mysql'
-      #     command: 'buildAndPush'
-      #     Dockerfile: '$(System.DefaultWorkingDirectory)/api/db/Dockerfile'
-      #     tags: 'latest'
-
-      # - task: Docker@2
-      #   inputs:
-      #     containerRegistry: ${{ parameters.containerRegistry }}
-      #     repository: 'website'
-      #     command: 'buildAndPush'
-      #     Dockerfile: '$(System.DefaultWorkingDirectory)/website/Dockerfile'
-      #     tags: 'latest'
