@@ -24,7 +24,7 @@ pool:
 stages:
   - stage: main
     jobs:
-    - job: Docker Compose MySql
+    - job: DockerComposeMySql
       steps:
 
       - task: DockerCompose@0
