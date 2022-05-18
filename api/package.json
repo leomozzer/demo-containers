@@ -17,6 +17,7 @@
     "nodemon": "^1.19.4"
   },
   "dependencies": {
+    "dotenv": "^16.0.1",
     "express": "^4.17.3",
     "mysql2": "^2.3.3"
   }

@@ -1,0 +1,15 @@
+version : '3'
+services:
+  api:
+    image: <acrName>.azurecr.io/api
+    container_name: api-container
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+       - "./api:/home/node/app"
+    ports:
+       - 9001:9001
+    restart: "always"
+    environment:
+      MYSQL_HOST: ${MYSQL_HOST}

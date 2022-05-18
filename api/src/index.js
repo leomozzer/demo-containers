@@ -1,6 +1,6 @@
 const express = require('express');
 const mysql = require('mysql2');
-
+require('dotenv').config()
 const app = express();
 
 app.use(express.json())
@@ -16,10 +16,11 @@ app.get('/', (req, res) => {
 })
 
 const connection = mysql.createConnection({
-  host: 'mysql',
+  host: process.env.MYSQL_HOST ? process.env.MYSQL_HOST : 'mysql',
   user: 'root',
   password: 'skaylink',
-  database: 'skaylinkbr'
+  database: 'skaylinkbr',
+  port: process.env.MYSQL_PORT ? process.env.MYSQL_PORT : 3306
 });
 
 connection.connect();
