@@ -28,10 +28,8 @@ stages:
     - job: DockerComposeMySql
       steps:
 
-      - task: DockerCompose@0
-        displayName: Build services
-        inputs:
-          action: Build services
+      - template: ../templates/docker-compose/build.yml
+        parameters:        
           azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
           azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
           dockerComposeFile: db/docker-compose.yml

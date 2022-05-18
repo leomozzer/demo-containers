@@ -1,0 +1,21 @@
+parameters:
+  - name: azureSubscriptionEndpoint
+  - name: azureContainerRegistry
+  - name: dockerComposeFile
+  - name: projectName
+  - name: qualifyImageNames
+
+jobs:
+  - job: 'BuildServices'
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+      - task: DockerCompose@0
+        displayName: Build services
+        inputs:
+          action: Build services
+          azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
+          azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
+          dockerComposeFile: ${{ parameters.dockerComposeFile }}
+          projectName: ${{ parameters.azureContainerRegistry }}
+          qualifyImageNames: ${{ parameters.qualifyImageNames }}
