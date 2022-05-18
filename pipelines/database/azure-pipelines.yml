@@ -1,0 +1,63 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - main
+  paths:
+    exclude: 
+    - README.md
+    - LICENSE
+    - api
+    - website
+    include:
+    - db
+
+parameters:
+  - name: azureContainerRegistry
+    default: wttohsfacr.azurecr.io
+  - name: azureSubscriptionEndpoint
+    default: wttohsfacr
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: main
+    jobs:
+    - job: Docker Compose MySql
+      steps:
+
+      - task: DockerCompose@0
+        displayName: Push services
+        inputs:
+          action: Push services
+          containerregistrytype: Azure Container Registry
+          azureSubscriptionEndpoint: $(azureSubscriptionEndpoint)
+          azureContainerRegistry: $(azureContainerRegistry)
+          dockerComposeFile: db/docker-compose.yml
+          projectName: mysql
+          qualifyImageNames: true
+
+      # - task: Docker@2
+      #   inputs:
+      #     containerRegistry: ${{ parameters.containerRegistry }}
+      #     repository: 'api'
+      #     command: 'buildAndPush'
+      #     Dockerfile: '$(System.DefaultWorkingDirectory)/api/Dockerfile'
+      #     tags: 'latest'
+
+      # - task: Docker@2
+      #   inputs:
+      #     containerRegistry: ${{ parameters.containerRegistry }}
+      #     repository: 'mysql'
+      #     command: 'buildAndPush'
+      #     Dockerfile: '$(System.DefaultWorkingDirectory)/api/db/Dockerfile'
+      #     tags: 'latest'
+
+      # - task: Docker@2
+      #   inputs:
+      #     containerRegistry: ${{ parameters.containerRegistry }}
+      #     repository: 'website'
+      #     command: 'buildAndPush'
+      #     Dockerfile: '$(System.DefaultWorkingDirectory)/website/Dockerfile'
+      #     tags: 'latest'

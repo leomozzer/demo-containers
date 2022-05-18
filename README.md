@@ -101,8 +101,6 @@ terraform apply -auto-approve main.plan
 * Use the terraform/backend to create the Azure Container Registry (ACR)
 * Get the credentials of the ACR
 * Use the command `docker login <acrName>.azurecr.io` and provide the username and password
-* Run the command `docker build . -t <acrName>.azurecr.io/api`
-* Run the command `docker push <acrName>.azurecr.io/api`
 
 ## Docker Compose and Azure
 * [Deploy a multi-container group using Docker Compose](https://docs.microsoft.com/en-us/azure/container-instances/tutorial-docker-compose)

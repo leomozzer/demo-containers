@@ -1,0 +1,13 @@
+version : '3'
+services:
+  mysql:
+    image: wttohsfacr.azurecr.io/mysql
+    container_name: mysql-container
+    build: 
+      context: ./db
+      dockerfile: Dockerfile
+    volumes:
+       - "./db/data:/var/lib/mysql"
+       - "./db/scripts:/docker-entrypoint-initdb.d"
+    ports:
+       - 3306:3306
