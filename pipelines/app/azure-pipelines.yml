@@ -29,6 +29,7 @@ pool:
 
 stages:
   - stage: main
+    jobs:
     - template: ../templates/docker-compose/build-push.yml
       parameters:        
         azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
