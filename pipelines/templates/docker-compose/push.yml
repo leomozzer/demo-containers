@@ -4,9 +4,12 @@ parameters:
   - name: dockerComposeFile
   - name: projectName
   - name: qualifyImageNames
+  - name: depends_on
+    default: []
 
 jobs:
-  - job: 'PushServices'
+  - job: 'DockerComposePush'
+    dependsOn: ${{ parameters.depends_on }}
     pool:
       vmImage: ubuntu-latest
     steps:

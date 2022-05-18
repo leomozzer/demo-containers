@@ -6,7 +6,7 @@ parameters:
   - name: qualifyImageNames
 
 jobs:
-  - job: 'BuildServices'
+  - job: 'DockerComposeBuild'
     pool:
       vmImage: ubuntu-latest
     steps:
