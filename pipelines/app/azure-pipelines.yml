@@ -38,8 +38,8 @@ stages:
           action: Build services
           azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
           azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
-          dockerComposeFile: ${{ parameters.dockerComposeFile }}
-          projectName: db/docker-compose.yml
+          dockerComposeFile: db/docker-compose.yml
+          projectName: mysql
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
           
       - task: DockerCompose@0
@@ -49,8 +49,8 @@ stages:
           containerregistrytype: Azure Container Registry
           azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
           azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
-          dockerComposeFile: ${{ parameters.dockerComposeFile }}
-          projectName: db/docker-compose.yml
+          dockerComposeFile: db/docker-compose.yml
+          projectName: mysql
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
     # - template: ../templates/docker-compose/build-push.yml
     #   parameters:        
@@ -72,7 +72,7 @@ stages:
           azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
           azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
           dockerComposeFile: api/docker-compose.yml
-          projectName: ${{ parameters.azureContainerRegistry }}
+          projectName: api
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
           dockerComposeFileArgs: |
             MYSQL_HOST=""
@@ -86,7 +86,7 @@ stages:
           azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
           azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
           dockerComposeFile: api/docker-compose.yml
-          projectName: ${{ parameters.projectName }}
+          projectName: api
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
           dockerComposeFileArgs: |
             MYSQL_HOST="20.123.233.107"
