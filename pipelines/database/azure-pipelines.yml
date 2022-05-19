@@ -32,3 +32,4 @@ stages:
           dockerComposeFile: db/docker-compose.yml
           projectName: mysql
           qualifyImageNames: true
+          jobName: MySqlDockerCompose

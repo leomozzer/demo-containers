@@ -19,6 +19,22 @@ module "acg_mysql" {
   protocol        = "TCP"
 }
 
+module "acg_mysql" {
+  source          = "./modules/acg"
+  acg_name        = "api-container"
+  rg_name         = azurerm_resource_group.rg.name
+  rg_location     = azurerm_resource_group.rg.location
+  ip_address_type = "Public"
+  os_type         = "Linux"
+  acr_username    = var.acr_username
+  acr_password    = var.acr_password
+  acr_server      = var.acr_server
+  container_name  = "api-container"
+  container_image = "${var.acr_server}/api:latest"
+  port            = 9001
+  protocol        = "TCP"
+}
+
 # resource "azurerm_container_group" "example" {
 #   name                = "example-continst"
 #   location            = azurerm_resource_group.example.location

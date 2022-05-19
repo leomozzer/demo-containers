@@ -14,7 +14,7 @@ trigger:
 
 parameters:
   - name: azureContainerRegistry
-    default: ufjmmjtacr.azurecr.io
+    default: xeqscruacr.azurecr.io
   - name: azureSubscriptionEndpoint
     default: AzureDevOps
   - name: dockerComposeFile
@@ -30,17 +30,39 @@ pool:
 stages:
   - stage: main
     jobs:
-    - template: ../templates/docker-compose/build-push.yml
-      parameters:        
-        azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
-        azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
-        dockerComposeFile: db/docker-compose.yml
-        projectName: mysql
-        qualifyImageNames: true
-        jobName: MySqlDockerCompose
+    - job: MySql
+      steps:
+      - task: DockerCompose@0
+        displayName: Build services
+        inputs:
+          action: Build services
+          azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
+          azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
+          dockerComposeFile: ${{ parameters.dockerComposeFile }}
+          projectName: db/docker-compose.yml
+          qualifyImageNames: ${{ parameters.qualifyImageNames }}
+          
+      - task: DockerCompose@0
+        displayName: Push services
+        inputs:
+          action: Push services
+          containerregistrytype: Azure Container Registry
+          azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
+          azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
+          dockerComposeFile: ${{ parameters.dockerComposeFile }}
+          projectName: db/docker-compose.yml
+          qualifyImageNames: ${{ parameters.qualifyImageNames }}
+    # - template: ../templates/docker-compose/build-push.yml
+    #   parameters:        
+    #     azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
+    #     azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
+    #     dockerComposeFile: db/docker-compose.yml
+    #     projectName: mysql
+    #     qualifyImageNames: true
+    #     jobName: MySqlDockerCompose
 
-    - job: NodeJSDockerCompose
-      dependsOn: MySqlDockerCompose
+    - job: NodeJS
+      dependsOn: MySql
       steps:
 
       - task: DockerCompose@0
@@ -49,7 +71,7 @@ stages:
           action: Build services
           azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
           azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
-          dockerComposeFile: ${{ parameters.dockerComposeFile }}
+          dockerComposeFile: api/docker-compose.yml
           projectName: ${{ parameters.azureContainerRegistry }}
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
           dockerComposeFileArgs: |
@@ -63,7 +85,7 @@ stages:
           containerregistrytype: Azure Container Registry
           azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
           azureContainerRegistry: ${{ parameters.azureContainerRegistry }}
-          dockerComposeFile: ${{ parameters.dockerComposeFile }}
+          dockerComposeFile: api/docker-compose.yml
           projectName: ${{ parameters.projectName }}
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
           dockerComposeFileArgs: |
