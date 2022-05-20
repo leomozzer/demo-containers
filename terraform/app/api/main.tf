@@ -19,6 +19,6 @@ module "acg_api" {
   protocol        = "TCP"
 }
 
-output "mysql_ip_address" {
-  value = module.acg_mysql.acg_ip_address
+output "api_ip_address" {
+  value = module.acg_api.acg_ip_address
 }
