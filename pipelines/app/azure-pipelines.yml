@@ -123,6 +123,13 @@ stages:
             $data = Get-content $(System.ArtifactsDirectory)/tfstates-database/output.json | out-string | ConvertFrom-Json
             Write-Host "##vso[task.setvariable variable=ipMysql;]$data.mysql_ip_address.value"
 
+      - task: PowerShell@2
+        displayName: 'MySql IP Address'
+        inputs:
+          targetType: 'inline'
+          script: |
+            Write-Host "$(ipMysql)"
+
       - task: DockerCompose@0
         displayName: Build services
         inputs:
