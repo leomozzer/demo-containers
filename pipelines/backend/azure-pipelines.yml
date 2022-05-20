@@ -49,15 +49,14 @@ stages:
           work_dir: ${{ parameters.backendDir }}
           archive_type: 'tar'
           output_file: 'tf-backend'
-          artifact_name: 'tfstates'
           
     - job: 'SaveFile'
-      dependsOn: ${{ parameters.depends_on }}
+      dependsOn: 'Terraform'
       condition: always()
       steps:
       - template: ../templates/storage-account/upload.yml
         parameters:
           file_name: 'tf-backend.tar'
-          working_dir: ${{ parameters.apiDir }}
+          working_dir: ${{ parameters.backendDir }}
           storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
