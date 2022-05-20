@@ -84,9 +84,9 @@ stages:
         parameters:
           output_file: 'tf-backend.tar'
           file_name: 'terraform.tfstate'
-          artifact_name: 'tfstates'
           storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
+          working_dir: ${{ parameters.databaseDir }}
       
       - task: CopyFiles@2
         inputs:
