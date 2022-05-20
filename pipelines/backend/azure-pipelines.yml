@@ -36,6 +36,7 @@ stages:
         container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
 
     - job: Terraform
+      dependsOn: 'DownloadFile'
       steps: 
       - template: ../templates/steps/terraform.yml
         parameters:
@@ -46,7 +47,6 @@ stages:
           archive_type: 'tar'
           output_file: 'tf-backend'
           artifact_name: 'tfstates'
-          depends_on: 'DownloadFile'
         
     # - template: ../templates/terraform.yml
     #   parameters:

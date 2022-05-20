@@ -14,7 +14,7 @@ trigger:
 
 parameters:
   - name: azureContainerRegistry
-    default: xeqscruacr.azurecr.io
+    default: hnvthifacr.azurecr.io
   - name: azureSubscriptionEndpoint
     default: AzureDevOps
   - name: dockerComposeFile
@@ -62,13 +62,12 @@ stages:
       - template: ../templates/steps/terraform.yml
         parameters:
           out_file: "main"
-          input_vars:  '-var "app_name=${{ parameters.app_name }}" -var "subscription_id=$(SUBSCRIPTION-ID)" -var "client_id=$(CLIENT-ID)" -var "client_secret=$(CLIENT-SECRET)" -var "tenant_id=$(TENANT-ID)"'
+          input_vars:  '-var "app_name=${{ parameters.app_name }}" -var "subscription_id=$(SUBSCRIPTION-ID)" -var "client_id=$(CLIENT-ID)" -var "client_secret=$(CLIENT-SECRET)" -var "tenant_id=$(TENANT-ID)" -var "acr_username=$(TENANT-ID)"'
           include_root_rolder: true
-          work_dir: ${{ parameters.backendDir }}
+          work_dir: ${{ parameters.databaseDir }}
           archive_type: 'tar'
-          output_file: 'tf-backend'
-          artifact_name: 'tfstates'
-          depends_on: 'DownloadFile'
+          output_file: 'tf-database'
+          artifact_name: 'tfstates-database'
     # - template: ../templates/docker-compose/build-push.yml
     #   parameters:        
     #     azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
