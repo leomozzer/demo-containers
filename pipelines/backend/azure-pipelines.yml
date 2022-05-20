@@ -37,6 +37,7 @@ stages:
 
     - job: Terraform
       dependsOn: 'DownloadFile'
+      condition: always()
       steps: 
       - template: ../templates/steps/terraform.yml
         parameters:
