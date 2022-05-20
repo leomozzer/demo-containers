@@ -168,13 +168,13 @@ stages:
           file_name: 'tf-api.tar'
           storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
-          working_dir: ${{ parameters.apiDir }}
+          working_dir: $(System.DefaultWorkingDirectory)/${{ parameters.apiDir }}
 
       - task: ExtractFiles@1
         continueOnError: true
         inputs:
-          archiveFilePatterns: 'tf-api.tar'
-          destinationFolder: ${{ parameters.apiDir }}
+          archiveFilePatterns: '$(System.DefaultWorkingDirectory)/${{ parameters.apiDir }}/tf-api.tar'
+          destinationFolder: $(System.DefaultWorkingDirectory)/${{ parameters.apiDir }}
           cleanDestinationFolder: false
 
       - template: ../templates/steps/terraform.yml
