@@ -121,7 +121,8 @@ stages:
           targetType: 'inline'
           script: |
             $data = Get-content $(System.ArtifactsDirectory)/tfstates-database/output.json | out-string | ConvertFrom-Json
-            Write-Host "##vso[task.setvariable variable=ipMysql;]$data.mysql_ip_address.value"
+            $ip_address = $data.mysql_ip_address.value
+            Write-Host "##vso[task.setvariable variable=ipMysql;]$ip_address"
 
       - task: PowerShell@2
         displayName: 'MySql IP Address'
