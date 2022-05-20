@@ -186,6 +186,14 @@ stages:
           archive_type: 'tar'
           output_file: 'tf-api'
 
+      - task: ArchiveFiles@2
+        inputs:
+          rootFolderOrFile: ${{ parameters.apiDir }}/terraform.tfstate
+          archiveType: 'tar'
+          archiveFile: ${{ parameters.apiDir }}/tf-api.tar
+          replaceExistingArchive: true
+          includeRootFolder: false
+
       - template: ../templates/storage-account/upload.yml
         parameters:
           file_name: 'tf-api.tar'
