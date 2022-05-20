@@ -62,7 +62,7 @@ stages:
       - template: ../templates/steps/terraform.yml
         parameters:
           out_file: "main"
-          input_vars:  '-var "app_name=${{ parameters.app_name }}" -var "subscription_id=$(SUBSCRIPTION-ID)" -var "client_id=$(CLIENT-ID)" -var "client_secret=$(CLIENT-SECRET)" -var "tenant_id=$(TENANT-ID)" -var "acr_username=$(TENANT-ID)"'
+          input_vars:  '-var "app_name=${{ parameters.app_name }}" -var "subscription_id=$(SUBSCRIPTION-ID)" -var "client_id=$(CLIENT-ID)" -var "client_secret=$(CLIENT-SECRET)" -var "tenant_id=$(TENANT-ID)" -var "acr_username=$(acr-username)" -var "acr_password=$(acr-password)" -var "acr_server=$(acr-username).azurecr.io"'
           include_root_rolder: true
           work_dir: ${{ parameters.databaseDir }}
           archive_type: 'tar'
