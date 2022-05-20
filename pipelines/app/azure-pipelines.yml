@@ -43,7 +43,7 @@ stages:
         inputs:
           action: Build services
           azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
-          azureContainerRegistry: $(acr-username).azurecr.io
+          azureContainerRegistry: '$(acr-username).azurecr.io'
           dockerComposeFile: db/docker-compose.yml
           projectName: mysql
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
@@ -54,7 +54,7 @@ stages:
           action: Push services
           containerregistrytype: Azure Container Registry
           azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
-          azureContainerRegistry: $(acr-username).azurecr.io
+          azureContainerRegistry: '$(acr-username).azurecr.io'
           dockerComposeFile: db/docker-compose.yml
           projectName: mysql
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
@@ -86,7 +86,7 @@ stages:
         inputs:
           action: Build services
           azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
-          azureContainerRegistry: $(acr-username).azurecr.io
+          azureContainerRegistry: '$(acr-username).azurecr.io'
           dockerComposeFile: api/docker-compose.yml
           projectName: api
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
@@ -100,7 +100,7 @@ stages:
           action: Push services
           containerregistrytype: Azure Container Registry
           azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
-          azureContainerRegistry: $(acr-username).azurecr.io
+          azureContainerRegistry: '$(acr-username).azurecr.io'
           dockerComposeFile: api/docker-compose.yml
           projectName: api
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
