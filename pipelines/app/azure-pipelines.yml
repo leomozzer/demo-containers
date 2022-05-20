@@ -62,23 +62,12 @@ stages:
           projectName: mysql
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
 
-      - task: DownloadBuildArtifacts@0
-        displayName: 'Get tfstate files'
-        continueOnError: true
-        inputs:
-          buildType: 'current'
-          downloadType: 'single'
-          artifactName: 'tfstates-database'
-          downloadPath: '$(System.ArtifactsDirectory)'
-
-      - task: CopyFiles@2
-        displayName: 'Move tfstate files'
-        continueOnError: true
-        inputs:
-          SourceFolder: '$(System.ArtifactsDirectory)/tfstates-database'
-          Contents: |
-            terraform.tfstate
-          TargetFolder: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}'
+      # - template: ../templates/steps/terraform.yml
+      #   parameters:
+      #     file_name: 'terraform.tfstate'
+      #     storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
+      #     container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
+      #     working_dir: ${{ parameters.databaseDir }}
 
       - template: ../templates/steps/terraform.yml
         parameters:
@@ -124,13 +113,6 @@ stages:
             $ip_address = $data.mysql_ip_address.value
             Write-Host "##vso[task.setvariable variable=ipMysql;]$ip_address"
 
-      - task: PowerShell@2
-        displayName: 'MySql IP Address'
-        inputs:
-          targetType: 'inline'
-          script: |
-            Write-Host "$(ipMysql)"
-
       - task: DockerCompose@0
         displayName: Build services
         inputs:
@@ -157,3 +139,13 @@ stages:
           dockerComposeFileArgs: |
             MYSQL_HOST=$(ipMysql)
             MYSQL_PORT=3306
+
+      - template: ../templates/steps/terraform.yml
+        parameters:
+          out_file: "main"
+          input_vars:  '-var "app_name=${{ parameters.app_name }}-$(acr-name)" -var "subscription_id=$(SUBSCRIPTION-ID)" -var "client_id=$(CLIENT-ID)" -var "client_secret=$(CLIENT-SECRET)" -var "tenant_id=$(TENANT-ID)" -var "acr_username=$(acr-name)" -var "acr_password=$(acr-admin-password)" -var "acr_server=$(acr-name).azurecr.io"'
+          include_root_rolder: true
+          work_dir: ${{ parameters.databaseDir }}
+          archive_type: 'tar'
+          output_file: 'tf-api'
+          artifact_name: 'tfstates-api'

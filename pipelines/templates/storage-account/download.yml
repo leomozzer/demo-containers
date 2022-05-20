@@ -1,6 +1,5 @@
 parameters:
-  - name: file_name
-  - name: artifact_name  
+  - name: file_name  
   - name: storage_account_name
   - name: container_name
   - name: working_dir
