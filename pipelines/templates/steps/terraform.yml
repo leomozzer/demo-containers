@@ -64,12 +64,22 @@ steps:
       script: |
         terraform apply -auto-approve -lock-timeout=10m ${{ parameters.out_file }}.plan
       workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.work_dir }}'
+  
+  - task: Bash@3
+    displayName: 'Terraform Output'
+    inputs:
+      targetType: 'inline'
+      script: |
+        terraform output -json > ./output.json
+      workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.work_dir }}'
+
 
   - task: CopyFiles@2
     inputs:
       SourceFolder: '$(System.DefaultWorkingDirectory)/${{ parameters.work_dir }}'
       Contents: |
         terraform.tfstate
+        output.json
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
   - task: PublishBuildArtifacts@1

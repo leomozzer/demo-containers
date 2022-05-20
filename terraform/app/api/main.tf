@@ -1,17 +1,17 @@
-resource "random_string" "random" {
-  length  = 7
-  special = false
-  upper   = false
-  number  = false
-}
+# resource "random_string" "random" {
+#   length  = 7
+#   special = false
+#   upper   = false
+#   number  = false
+# }
 
-locals {
-  project_name  = "${var.app_name}-${random_string.random.result}"
-  random_result = random_string.random.result
-}
+# locals {
+#   project_name  = "${var.app_name}-${random_string.random.result}"
+#   random_result = random_string.random.result
+# }
 
 resource "azurerm_resource_group" "rg" {
-  name     = "${local.project_name}-rg-api"
+  name     = "${var.app_name}}-rg-mysql"
   location = "West Europe"
 }
 
