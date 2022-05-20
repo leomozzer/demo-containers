@@ -28,12 +28,14 @@ stages:
   - stage: main
     jobs:
 
-    - template: ../templates/storage-account/download.yml
-      parameters:        
-        file_name: 'terraform.tfstate'
-        artifact_name: 'tfstates'
-        storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
-        container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
+    - job: DownloadFile
+      steps:
+      - template: ../templates/storage-account/download.yml
+        parameters:        
+          file_name: 'terraform.tfstate'
+          artifact_name: 'tfstates'
+          storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
+          container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
 
     - job: Terraform
       dependsOn: 'DownloadFile'
