@@ -1,12 +1,12 @@
 parameters:
   - name: working_dir
-  - name: output_file
   - name: file_name
   - name: storage_account_name
   - name: container_name
 
 steps:
   - task: AzureCLI@2
+    displayName: UploadFile
     inputs:
       workingDirectory: '${{ parameters.working_dir }}'
       azureSubscription: 'AzureDevOps'
