@@ -107,12 +107,21 @@ stages:
       dependsOn: MySql
       steps:
 
-      # - task: DownloadBuildArtifacts@0
-      #   inputs:
-      #     buildType: 'current'
-      #     downloadType: 'single'
-      #     artifactName: ${{ parameters.artifact_name }}
-      #     downloadPath: '$(System.ArtifactsDirectory)'
+      - task: DownloadBuildArtifacts@0
+        displayName: 'Get artifacts from mysql tf'
+        inputs:
+          buildType: 'current'
+          downloadType: 'single'
+          artifactName: 'tfstates-database'
+          downloadPath: '$(System.ArtifactsDirectory)'
+
+      - task: PowerShell@2
+        displayName: 'Get Ip address from mysql acg'
+        inputs:
+          targetType: 'inline'
+          script: |
+            $data = Get-content $(System.ArtifactsDirectory)/tfstates-database/output.json | out-string | ConvertFrom-Json
+            Write-Host "##vso[task.setvariable variable=ipMysql;]$data.mysql_ip_address.value"
 
       - task: DockerCompose@0
         displayName: Build services
@@ -124,7 +133,7 @@ stages:
           projectName: api
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
           dockerComposeFileArgs: |
-            MYSQL_HOST=""
+            MYSQL_HOST=$(ipMysql)
             MYSQL_PORT=3306
           
       - task: DockerCompose@0
@@ -138,5 +147,5 @@ stages:
           projectName: api
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
           dockerComposeFileArgs: |
-            MYSQL_HOST="20.123.233.107"
+            MYSQL_HOST=$(ipMysql)
             MYSQL_PORT=3306
