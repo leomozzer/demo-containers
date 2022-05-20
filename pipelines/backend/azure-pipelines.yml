@@ -57,8 +57,7 @@ stages:
       steps:
       - template: ../templates/storage-account/upload.yml
         parameters:
-          output_file: 'tf-backend.tar'
-          file_name: 'terraform.tfstate'
-          artifact_name: 'tfstates'
+          file_name: 'tf-backend.tar'
+          working_dir: ${{ parameters.apiDir }}
           storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
