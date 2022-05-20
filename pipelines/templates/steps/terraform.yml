@@ -20,7 +20,7 @@ steps:
       targetType: 'inline'
       script: |
         terraform init
-      workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.work_dir }}'
+      workingDirectory: '${{ parameters.work_dir }}'
 
   - task: Bash@3
     displayName: 'Terraform check format'
@@ -28,7 +28,7 @@ steps:
       targetType: 'inline'
       script: |
         terraform fmt -check -recursive -diff
-      workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.work_dir }}'
+      workingDirectory: '${{ parameters.work_dir }}'
 
   - task: Bash@3
     displayName: 'Terraform plan'
@@ -36,7 +36,7 @@ steps:
       targetType: 'inline'
       script: |
         terraform plan -out=${{ parameters.out_file }}.plan -input=false ${{ parameters.input_vars }}
-      workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.work_dir }}'
+      workingDirectory: '${{ parameters.work_dir }}'
 
   - task: Bash@3
     displayName: 'Terraform Apply'
@@ -44,7 +44,7 @@ steps:
       targetType: 'inline'
       script: |
         terraform apply -auto-approve -lock-timeout=10m ${{ parameters.out_file }}.plan
-      workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.work_dir }}'
+      workingDirectory: '${{ parameters.work_dir }}'
   
   - task: Bash@3
     displayName: 'Terraform Output'
@@ -52,4 +52,4 @@ steps:
       targetType: 'inline'
       script: |
         terraform output -json > ./output.json
-      workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.work_dir }}'
+      workingDirectory: '${{ parameters.work_dir }}'
