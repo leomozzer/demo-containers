@@ -3,7 +3,7 @@ parameters:
   - name: input_vars
   - name: include_root_rolder
   - name: work_dir
-  - name : archive_type
+  - name: archive_type
   - name: output_file
 
 steps:
