@@ -84,6 +84,7 @@ stages:
         inputs:
           archiveFilePatterns: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}/tf-database.tar'
           destinationFolder: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}'
+          cleanDestinationFolder: false
 
       - task: Bash@3
         displayName: 'LS'
