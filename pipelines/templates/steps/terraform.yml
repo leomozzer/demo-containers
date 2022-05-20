@@ -5,7 +5,6 @@ parameters:
   - name: work_dir
   - name : archive_type
   - name: output_file
-  - name: artifact_name
 
 steps:
 

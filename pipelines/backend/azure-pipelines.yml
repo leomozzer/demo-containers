@@ -50,12 +50,15 @@ stages:
           archive_type: 'tar'
           output_file: 'tf-backend'
           artifact_name: 'tfstates'
-
-    - template: ../templates/storage-account/upload.yml
-      parameters:
-        depends_on: 'Terraform'
-        output_file: 'tf-backend.tar'
-        file_name: 'terraform.tfstate'
-        artifact_name: 'tfstates'
-        storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
-        container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
+          
+    - job: 'SaveFile'
+      dependsOn: ${{ parameters.depends_on }}
+      condition: always()
+      steps:
+      - template: ../templates/storage-account/upload.yml
+        parameters:
+          output_file: 'tf-backend.tar'
+          file_name: 'terraform.tfstate'
+          artifact_name: 'tfstates'
+          storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
+          container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
