@@ -38,6 +38,16 @@ stages:
     jobs:
     - job: MySql
       steps:
+
+      - task: Bash@3
+        displayName: 'Echo variables'
+        inputs:
+          targetType: 'inline'
+          script: |
+            echo $(acr-admin-password)
+            echo $(acr-name)
+            echo $(acr-admin-user)
+        
       - task: DockerCompose@0
         displayName: Build services
         inputs:
