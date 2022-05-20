@@ -1,5 +1,5 @@
 resource "azurerm_resource_group" "rg" {
-  name     = "${var.app_name}}-rg-mysql"
+  name     = "${var.app_name}-rg-mysql"
   location = "West Europe"
 }
 
@@ -20,5 +20,5 @@ module "acg_mysql" {
 }
 
 output "mysql_ip_address" {
-  value = module.acg_mysql.ip_address
+  value = module.acg_mysql.acg_ip_address
 }
