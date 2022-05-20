@@ -71,11 +71,27 @@ stages:
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
           working_dir: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}'
 
+      - task: Bash@3
+        displayName: 'LS'
+        inputs:
+          targetType: 'inline'
+          script: |
+            ls -ltr
+          workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}'
+
       - task: ExtractFiles@1
         continueOnError: true
         inputs:
           archiveFilePatterns: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}/tf-database.tar'
           destinationFolder: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}'
+
+      - task: Bash@3
+        displayName: 'LS'
+        inputs:
+          targetType: 'inline'
+          script: |
+            ls -ltr
+          workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}'
 
       - template: ../templates/steps/terraform.yml
         parameters:
