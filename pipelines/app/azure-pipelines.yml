@@ -75,7 +75,7 @@ stages:
         displayName: 'Move tfstate files'
         continueOnError: true
         inputs:
-          SourceFolder: '$(System.ArtifactsDirectory)/'tfstates-database''
+          SourceFolder: '$(System.ArtifactsDirectory)/'tfstates-database'
           Contents: |
             terraform.tfstate
           TargetFolder: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}'
