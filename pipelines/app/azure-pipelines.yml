@@ -62,6 +62,24 @@ stages:
           projectName: mysql
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
 
+      - task: DownloadBuildArtifacts@0
+        displayName: 'Get tfstate files'
+        continueOnError: true
+        inputs:
+          buildType: 'current'
+          downloadType: 'single'
+          artifactName: 'tfstates-database'
+          downloadPath: '$(System.ArtifactsDirectory)'
+
+      - task: CopyFiles@2
+        displayName: 'Move tfstate files'
+        continueOnError: true
+        inputs:
+          SourceFolder: '$(System.ArtifactsDirectory)/'tfstates-database''
+          Contents: |
+            terraform.tfstate
+          TargetFolder: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}'
+
       - template: ../templates/steps/terraform.yml
         parameters:
           out_file: "main"
@@ -71,10 +89,30 @@ stages:
           archive_type: 'tar'
           output_file: 'tf-database'
           artifact_name: 'tfstates-database'
+      
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}'
+          Contents: |
+            terraform.tfstate
+            output.json
+          TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathToPublish: '$(Build.ArtifactStagingDirectory)'
+          artifactName: 'tfstates-database'
 
     - job: NodeJS
       dependsOn: MySql
       steps:
+
+      # - task: DownloadBuildArtifacts@0
+      #   inputs:
+      #     buildType: 'current'
+      #     downloadType: 'single'
+      #     artifactName: ${{ parameters.artifact_name }}
+      #     downloadPath: '$(System.ArtifactsDirectory)'
 
       - task: DockerCompose@0
         displayName: Build services

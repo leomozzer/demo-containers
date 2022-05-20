@@ -9,24 +9,6 @@ parameters:
 
 steps:
 
-  - task: DownloadBuildArtifacts@0
-    displayName: 'Get tfstate files'
-    continueOnError: true
-    inputs:
-      buildType: 'current'
-      downloadType: 'single'
-      artifactName: ${{ parameters.artifact_name }}
-      downloadPath: '$(System.ArtifactsDirectory)'
-
-  - task: CopyFiles@2
-    displayName: 'Move tfstate files'
-    continueOnError: true
-    inputs:
-      SourceFolder: '$(System.ArtifactsDirectory)/${{ parameters.artifact_name }}'
-      Contents: |
-        terraform.tfstate
-      TargetFolder: '$(System.DefaultWorkingDirectory)/${{ parameters.work_dir }}'
-
   - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
     displayName: 'Install Terraform'
     continueOnError: true
@@ -72,17 +54,3 @@ steps:
       script: |
         terraform output -json > ./output.json
       workingDirectory: '$(System.DefaultWorkingDirectory)/${{ parameters.work_dir }}'
-
-
-  - task: CopyFiles@2
-    inputs:
-      SourceFolder: '$(System.DefaultWorkingDirectory)/${{ parameters.work_dir }}'
-      Contents: |
-        terraform.tfstate
-        output.json
-      TargetFolder: '$(Build.ArtifactStagingDirectory)'
-
-  - task: PublishBuildArtifacts@1
-    inputs:
-      pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: ${{ parameters.artifact_name }}
