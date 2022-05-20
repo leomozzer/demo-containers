@@ -69,13 +69,13 @@ stages:
           file_name: 'tf-database.tar'
           storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
-          working_dir: ${{ parameters.backendDir }}
+          working_dir: ${{ parameters.databaseDir }}
 
       - task: ExtractFiles@1
         continueOnError: true
         inputs:
           archiveFilePatterns: 'tf-database.tar'
-          destinationFolder: ${{ parameters.backendDir }}
+          destinationFolder: ${{ parameters.databaseDir }}
 
       - template: ../templates/steps/terraform.yml
         parameters:
