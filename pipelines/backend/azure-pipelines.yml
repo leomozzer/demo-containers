@@ -48,17 +48,6 @@ stages:
           archive_type: 'tar'
           output_file: 'tf-backend'
           artifact_name: 'tfstates'
-        
-    # - template: ../templates/terraform.yml
-    #   parameters:
-    #     out_file: "main"
-    #     input_vars:  '-var "app_name=${{ parameters.app_name }}" -var "subscription_id=$(SUBSCRIPTION-ID)" -var "client_id=$(CLIENT-ID)" -var "client_secret=$(CLIENT-SECRET)" -var "tenant_id=$(TENANT-ID)"'
-    #     include_root_rolder: true
-    #     work_dir: ${{ parameters.backendDir }}
-    #     archive_type: 'tar'
-    #     output_file: 'tf-backend'
-    #     artifact_name: 'tfstates'
-    #     depends_on: 'DownloadFile'
 
     - template: ../templates/storage-account/upload.yml
       parameters:
