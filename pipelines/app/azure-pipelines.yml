@@ -64,6 +64,19 @@ stages:
           projectName: mysql
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
 
+      - template: ../templates/storage-account/download.yml
+        parameters:        
+          file_name: 'tf-database.tar'
+          storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
+          container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
+          working_dir: ${{ parameters.backendDir }}
+
+      - task: ExtractFiles@1
+        continueOnError: true
+        inputs:
+          archiveFilePatterns: 'tf-database.tar'
+          destinationFolder: ${{ parameters.backendDir }}
+
       - template: ../templates/steps/terraform.yml
         parameters:
           out_file: "main"
@@ -77,12 +90,12 @@ stages:
         inputs:
           rootFolderOrFile: ${{ parameters.databaseDir }}/terraform.tfstate
           archiveType: 'tar'
-          archiveFile: ${{ parameters.databaseDir }}/tf-backend.tar
+          archiveFile: ${{ parameters.databaseDir }}/tf-database.tar
           replaceExistingArchive: true
 
       - template: ../templates/storage-account/upload.yml
         parameters:
-          file_name: 'tf-backend.tar'
+          file_name: 'tf-database.tar'
           storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
           working_dir: ${{ parameters.databaseDir }}

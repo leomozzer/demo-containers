@@ -7,6 +7,7 @@ parameters:
 steps:
   - task: AzureCLI@2
     displayName: UploadFile
+    continueOnError: true
     inputs:
       workingDirectory: '${{ parameters.working_dir }}'
       azureSubscription: 'AzureDevOps'
