@@ -6,7 +6,7 @@ parameters:
 
 steps:
   - task: AzureCLI@2
-    displayName: 'Storage Account Download'
+    displayName: 'Download File'
     continueOnError: true
     inputs:
       workingDirectory: '${{ parameters.working_dir }}'

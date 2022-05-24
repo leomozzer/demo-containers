@@ -1,10 +1,8 @@
 parameters:
   - name: out_file
   - name: input_vars
-  - name: include_root_rolder
   - name: work_dir
-  - name: archive_type
-  - name: output_file
+  - name: terraformVersion
 
 steps:
 
@@ -12,7 +10,7 @@ steps:
     displayName: 'Install Terraform'
     continueOnError: true
     inputs:
-      terraformVersion: 0.14.7
+      terraformVersion: ${{ parameters.terraformVersion }}
 
   - task: Bash@3
     displayName: 'Terraform init'
