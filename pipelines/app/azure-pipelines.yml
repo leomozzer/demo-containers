@@ -155,6 +155,8 @@ stages:
           dockerComposeFileArgs: |
             MYSQL_HOST=$(ipMysql)
             MYSQL_PORT=3306
+        env:
+          MYSQL_HOST: $(ipMysql)
           
       - task: DockerCompose@0
         displayName: Push services
@@ -169,6 +171,9 @@ stages:
           dockerComposeFileArgs: |
             MYSQL_HOST=$(ipMysql)
             MYSQL_PORT=3306
+        env:
+          MYSQL_HOST: $(ipMysql)
+
 
       - template: ../templates/storage-account/download.yml
         parameters:        

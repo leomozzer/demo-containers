@@ -23,4 +23,8 @@ WORKDIR /home/node/app
 COPY package.json ./
 RUN npm install
 COPY . .
+
+ARG MYSQL_HOST
+ENV MYSQL_HOST=$MYSQL_HOST
+
 CMD npm start
