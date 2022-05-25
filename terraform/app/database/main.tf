@@ -1,5 +1,5 @@
 resource "azurerm_resource_group" "rg" {
-  name     = "${var.app_name}-rg-mysql"
+  name     = "${var.app_name}-rg-mysql-${var.environment}"
   location = "West Europe"
 }
 
