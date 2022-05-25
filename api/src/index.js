@@ -14,7 +14,8 @@ const PORT = 9001 //change to 9001 when sending all the project
 app.get('/', (req, res) => {
   return res.json({
     "message": `Hello World! ${Date()}`,
-    "host": process.env.MYSQL_HOST
+    "host": process.env.MYSQL_HOST,
+    "test": "test"
   })
 })
 
