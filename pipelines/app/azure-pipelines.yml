@@ -141,7 +141,7 @@ stages:
         inputs:
           targetType: 'inline'
           script: |
-            Write-Host "MySql IP: $(ipMysql)""
+            Write-Host "MySql IP: $(ipMysql)"
 
       - task: DockerCompose@0
         displayName: Build services
