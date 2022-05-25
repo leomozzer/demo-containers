@@ -61,7 +61,7 @@ stages:
 
       - template: ../templates/storage-account/upload.yml
         parameters:
-          file_name: 'tf-acr.tar'
+          file_name: 'tf-acr-$(System.StageName).tar'
           working_dir: ${{ parameters.backendDir }}
           storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
