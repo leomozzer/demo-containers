@@ -15,8 +15,7 @@ app.get('/', (req, res) => {
 
   return res.json({
     "message": `Hello World! ${Date()}`,
-    "host": process.env.MYSQL_HOST,
-    "test": "test"
+    "host": process.env.MYSQL_HOST    
   })
 })
 
