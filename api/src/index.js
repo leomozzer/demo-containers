@@ -20,34 +20,34 @@ app.get('/', (req, res) => {
   })
 })
 
-// const connection = mysql.createConnection({
-//   host: process.env.MYSQL_HOST ? process.env.MYSQL_HOST : 'mysql',
-//   user: 'root',
-//   password: 'skaylink',
-//   database: 'skaylinkbr',
-//   port: process.env.MYSQL_PORT ? process.env.MYSQL_PORT : 3306
-// });
+const connection = mysql.createConnection({
+  host: process.env.MYSQL_HOST ? process.env.MYSQL_HOST : 'mysql',
+  user: 'root',
+  password: 'skaylink',
+  database: 'skaylinkbr',
+  port: process.env.MYSQL_PORT ? process.env.MYSQL_PORT : 3306
+});
 
-// connection.connect();
+connection.connect();
 
-// app.get('/people', function (req, res) {
-//   connection.query('SELECT * FROM people', function (error, results) {
+app.get('/people', function (req, res) {
+  connection.query('SELECT * FROM people', function (error, results) {
 
-//     if (error) {
-//       throw error
-//     };
-//     console.log(results);
-//     res.send(
-//       results.map(item => ({
-//         name: item.full_name,
-//         email: item.email,
-//         title: item.title,
-//         location: item.location_name
-//       })
-//       )
-//     );
-//   });
-// });
+    if (error) {
+      throw error
+    };
+    console.log(results);
+    res.send(
+      results.map(item => ({
+        name: item.full_name,
+        email: item.email,
+        title: item.title,
+        location: item.location_name
+      })
+      )
+    );
+  });
+});
 
 
 app.listen(PORT, () => {
