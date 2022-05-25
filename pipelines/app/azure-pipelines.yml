@@ -136,6 +136,13 @@ stages:
             $ip_address = $data.mysql_ip_address.value
             Write-Host "##vso[task.setvariable variable=ipMysql;]$ip_address"
 
+      - task: PowerShell@2
+        displayName: 'MySql ip'
+        inputs:
+          targetType: 'inline'
+          script: |
+            Write-Host "MySql IP: $(ipMysql)""
+
       - task: DockerCompose@0
         displayName: Build services
         inputs:
