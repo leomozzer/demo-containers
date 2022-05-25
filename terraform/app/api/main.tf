@@ -1,5 +1,5 @@
 resource "azurerm_resource_group" "rg" {
-  name     = "${var.app_name}-rg-api"
+  name     = "${var.app_name}-rg-api-${var.environment}"
   location = "West Europe"
 }
 

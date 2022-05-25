@@ -44,7 +44,7 @@ stages:
           azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
           azureContainerRegistry: '$(acr-name).azurecr.io'
           dockerComposeFile: db/docker-compose.yml
-          projectName: mysql
+          projectName: mysql-$(System.StageName)
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
           
       - task: DockerCompose@0
@@ -74,8 +74,8 @@ stages:
 
       - template: ../templates/steps/terraform.yml
         parameters:
-          out_file: $(System.StageName)
-          input_vars:  '-var "app_name=${{ parameters.app_name }}-$(acr-name)-$(System.StageName)" -var "subscription_id=$(SUBSCRIPTION-ID)" -var "client_id=$(CLIENT-ID)" -var "client_secret=$(CLIENT-SECRET)" -var "tenant_id=$(TENANT-ID)" -var "acr_username=$(acr-name)" -var "acr_password=$(acr-admin-password)" -var "acr_server=$(acr-name).azurecr.io"'
+          out_file: "acg-mysql-$(System.StageName)"
+          input_vars:  '-var "app_name=${{ parameters.app_name }}-$(acr-name)" -var "environment=$(System.StageName)" -var "subscription_id=$(SUBSCRIPTION-ID)" -var "client_id=$(CLIENT-ID)" -var "client_secret=$(CLIENT-SECRET)" -var "tenant_id=$(TENANT-ID)" -var "acr_username=$(acr-name)" -var "acr_password=$(acr-admin-password)" -var "acr_server=$(acr-name).azurecr.io"'
           work_dir: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}'
           terraformVersion: 0.14.7
 
@@ -180,8 +180,8 @@ stages:
 
       - template: ../templates/steps/terraform.yml
         parameters:
-          out_file: "main"
-          input_vars:  '-var "app_name=${{ parameters.app_name }}-$(acr-name)-$(System.StageName)" -var "subscription_id=$(SUBSCRIPTION-ID)" -var "client_id=$(CLIENT-ID)" -var "client_secret=$(CLIENT-SECRET)" -var "tenant_id=$(TENANT-ID)" -var "acr_username=$(acr-name)" -var "acr_password=$(acr-admin-password)" -var "acr_server=$(acr-name).azurecr.io"'
+          out_file: "acg-api-$(System.StageName)"
+          input_vars:  '-var "app_name=${{ parameters.app_name }}-$(acr-name)" -var "environment=$(System.StageName)" -var "subscription_id=$(SUBSCRIPTION-ID)" -var "client_id=$(CLIENT-ID)" -var "client_secret=$(CLIENT-SECRET)" -var "tenant_id=$(TENANT-ID)" -var "acr_username=$(acr-name)" -var "acr_password=$(acr-admin-password)" -var "acr_server=$(acr-name).azurecr.io"'
           work_dir: ${{ parameters.apiDir }}
           terraformVersion: 0.14.7
 
