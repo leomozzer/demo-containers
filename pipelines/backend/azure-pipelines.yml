@@ -28,7 +28,7 @@ stages:
   - stage: dev
     jobs:
 
-    - job: 'ACR Setup'
+    - job: 'ACR_Setup'
       steps:
       - template: ../templates/storage-account/download.yml
         parameters:        
