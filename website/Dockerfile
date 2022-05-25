@@ -1,2 +1,7 @@
 FROM php:7.2-apache
 WORKDIR /var/www/html
+
+ARG BACKEND_ADDRESS
+ENV BACKEND_ADDRESS=$BACKEND_ADDRESS
+
+RUN echo "backend address is $BACKEND_ADDRESS"

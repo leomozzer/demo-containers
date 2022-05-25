@@ -34,7 +34,7 @@ pool:
 stages:
   - stage: dev
     jobs:
-    - job: MySql
+    - job: Mysql
       steps:
         
       - task: DockerCompose@0
@@ -78,15 +78,6 @@ stages:
           input_vars:  '-var "app_name=${{ parameters.app_name }}-$(acr-name)" -var "environment=$(System.StageName)" -var "subscription_id=$(SUBSCRIPTION-ID)" -var "client_id=$(CLIENT-ID)" -var "client_secret=$(CLIENT-SECRET)" -var "tenant_id=$(TENANT-ID)" -var "acr_username=$(acr-name)" -var "acr_password=$(acr-admin-password)" -var "acr_server=$(acr-name).azurecr.io"'
           work_dir: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}'
           terraformVersion: 0.14.7
-
-      - task: PowerShell@2
-        displayName: 'MySql ip'
-        inputs:
-          targetType: 'inline'
-          script: |
-            $data = Get-content $(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}/output.json | out-string | ConvertFrom-Json
-            $ip_address = $data.mysql_ip_address.value
-            Write-Host "##vso[task.setvariable variable=ipMysql;]$ip_address"
       
       - task: ArchiveFiles@2
         inputs:
@@ -116,11 +107,11 @@ stages:
           artifactName: 'tfstates-database-$(System.StageName)'
 
     - job: NodeJS
-      dependsOn: MySql
+      dependsOn: Mysql
       steps:
 
       - task: DownloadBuildArtifacts@0
-        displayName: 'MySql artifacts'
+        displayName: 'mysql artifacts'
         inputs:
           buildType: 'current'
           downloadType: 'single'
@@ -128,7 +119,7 @@ stages:
           downloadPath: '$(System.ArtifactsDirectory)'
 
       - task: PowerShell@2
-        displayName: 'MySql ip'
+        displayName: 'mysql ip'
         inputs:
           targetType: 'inline'
           script: |
@@ -148,8 +139,6 @@ stages:
           dockerComposeFileArgs: |
             MYSQL_HOST=$(ipMysql)
             MYSQL_PORT=3306
-        # env:
-        #   MYSQL_HOST: $(ipMysql)
           
       - task: DockerCompose@0
         displayName: Push services
@@ -164,9 +153,6 @@ stages:
           dockerComposeFileArgs: |
             MYSQL_HOST=$(ipMysql)
             MYSQL_PORT=3306
-        # env:
-        #   MYSQL_HOST: $(ipMysql)
-
 
       - template: ../templates/storage-account/download.yml
         parameters:        
