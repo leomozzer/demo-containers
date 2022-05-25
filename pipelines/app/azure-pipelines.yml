@@ -205,3 +205,12 @@ stages:
           storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
           working_dir: ${{ parameters.apiDir }}
+
+      - task: AzureCLI@2
+        displayName: 'Restart Container'
+        inputs:
+          azureSubscription: 'AzureDevOps'
+          scriptType: 'pscore'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            az storage blob download --account-name ${{ parameters.storage_account_name }} --container-name ${{ parameters.container_name }} --name ${{ parameters.file_name }} --file ${{ parameters.file_name }} --auth-mode key

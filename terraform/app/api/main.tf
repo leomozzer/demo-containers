@@ -22,3 +22,11 @@ module "acg_api" {
 output "api_ip_address" {
   value = module.acg_api.acg_ip_address
 }
+
+output "rg_name" {
+  value = azurerm_resource_group.rg.name
+}
+
+output "acg_name" {
+  value = module.acg_api.acg_name
+}
