@@ -32,7 +32,7 @@ pool:
   vmImage: ubuntu-latest
 
 stages:
-  - stage: main
+  - stage: dev
     jobs:
     - job: MySql
       steps:
@@ -55,12 +55,12 @@ stages:
           azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
           azureContainerRegistry: '$(acr-name).azurecr.io'
           dockerComposeFile: db/docker-compose.yml
-          projectName: mysql
+          projectName: mysql-$(System.StageName)
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
 
       - template: ../templates/storage-account/download.yml
         parameters:        
-          file_name: 'tf-database.tar'
+          file_name: 'tf-database-$(System.StageName).tar'
           storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
           working_dir: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}'
@@ -68,65 +68,74 @@ stages:
       - task: ExtractFiles@1
         continueOnError: true
         inputs:
-          archiveFilePatterns: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}/tf-database.tar'
+          archiveFilePatterns: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}/tf-database-$(System.StageName).tar'
           destinationFolder: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}'
           cleanDestinationFolder: false
 
       - template: ../templates/steps/terraform.yml
         parameters:
-          out_file: "main"
-          input_vars:  '-var "app_name=${{ parameters.app_name }}-$(acr-name)" -var "subscription_id=$(SUBSCRIPTION-ID)" -var "client_id=$(CLIENT-ID)" -var "client_secret=$(CLIENT-SECRET)" -var "tenant_id=$(TENANT-ID)" -var "acr_username=$(acr-name)" -var "acr_password=$(acr-admin-password)" -var "acr_server=$(acr-name).azurecr.io"'
+          out_file: $(System.StageName)
+          input_vars:  '-var "app_name=${{ parameters.app_name }}-$(acr-name)-$(System.StageName)" -var "subscription_id=$(SUBSCRIPTION-ID)" -var "client_id=$(CLIENT-ID)" -var "client_secret=$(CLIENT-SECRET)" -var "tenant_id=$(TENANT-ID)" -var "acr_username=$(acr-name)" -var "acr_password=$(acr-admin-password)" -var "acr_server=$(acr-name).azurecr.io"'
           work_dir: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}'
           terraformVersion: 0.14.7
-      
-      - task: ArchiveFiles@2
-        inputs:
-          rootFolderOrFile: ${{ parameters.databaseDir }}/terraform.tfstate
-          archiveType: 'tar'
-          archiveFile: ${{ parameters.databaseDir }}/tf-database.tar
-          replaceExistingArchive: true
-          includeRootFolder: false
-
-      - template: ../templates/storage-account/upload.yml
-        parameters:
-          file_name: 'tf-database.tar'
-          storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
-          container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
-          working_dir: ${{ parameters.databaseDir }}
-      
-      - task: CopyFiles@2
-        inputs:
-          SourceFolder: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}'
-          Contents: |
-            terraform.tfstate
-            output.json
-          TargetFolder: '$(Build.ArtifactStagingDirectory)'
-
-      - task: PublishBuildArtifacts@1
-        inputs:
-          pathToPublish: '$(Build.ArtifactStagingDirectory)'
-          artifactName: 'tfstates-database'
-
-    - job: NodeJS
-      dependsOn: MySql
-      steps:
-
-      - task: DownloadBuildArtifacts@0
-        displayName: 'MySql artifacts'
-        inputs:
-          buildType: 'current'
-          downloadType: 'single'
-          artifactName: 'tfstates-database'
-          downloadPath: '$(System.ArtifactsDirectory)'
 
       - task: PowerShell@2
         displayName: 'MySql ip'
         inputs:
           targetType: 'inline'
           script: |
-            $data = Get-content $(System.ArtifactsDirectory)/tfstates-database/output.json | out-string | ConvertFrom-Json
+            $data = Get-content $(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}/output.json | out-string | ConvertFrom-Json
             $ip_address = $data.mysql_ip_address.value
             Write-Host "##vso[task.setvariable variable=ipMysql;]$ip_address"
+      
+      - task: ArchiveFiles@2
+        inputs:
+          rootFolderOrFile: ${{ parameters.databaseDir }}/terraform.tfstate
+          archiveType: 'tar'
+          archiveFile: ${{ parameters.databaseDir }}/tf-database-$(System.StageName).tar
+          replaceExistingArchive: true
+          includeRootFolder: false
+
+      - template: ../templates/storage-account/upload.yml
+        parameters:
+          file_name: 'tf-database-$(System.StageName).tar'
+          storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
+          container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
+          working_dir: ${{ parameters.databaseDir }}
+      
+      # - task: CopyFiles@2
+      #   inputs:
+      #     SourceFolder: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}'
+      #     Contents: |
+      #       terraform.tfstate
+      #       output.json
+      #     TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+      # - task: PublishBuildArtifacts@1
+      #   inputs:
+      #     pathToPublish: '$(Build.ArtifactStagingDirectory)'
+      #     artifactName: 'tfstates-database'
+
+    - job: NodeJS
+      dependsOn: MySql
+      steps:
+
+      # - task: DownloadBuildArtifacts@0
+      #   displayName: 'MySql artifacts'
+      #   inputs:
+      #     buildType: 'current'
+      #     downloadType: 'single'
+      #     artifactName: 'tfstates-database'
+      #     downloadPath: '$(System.ArtifactsDirectory)'
+
+      # - task: PowerShell@2
+      #   displayName: 'MySql ip'
+      #   inputs:
+      #     targetType: 'inline'
+      #     script: |
+      #       $data = Get-content $(System.ArtifactsDirectory)/tfstates-database/output.json | out-string | ConvertFrom-Json
+      #       $ip_address = $data.mysql_ip_address.value
+      #       Write-Host "##vso[task.setvariable variable=ipMysql;]$ip_address"
 
       - task: DockerCompose@0
         displayName: Build services
@@ -135,7 +144,7 @@ stages:
           azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
           azureContainerRegistry: '$(acr-name).azurecr.io'
           dockerComposeFile: api/docker-compose.yml
-          projectName: api
+          projectName: api-$(System.StageName)
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
           dockerComposeFileArgs: |
             MYSQL_HOST=$(ipMysql)
@@ -149,7 +158,7 @@ stages:
           azureSubscriptionEndpoint: ${{ parameters.azureSubscriptionEndpoint }}
           azureContainerRegistry: '$(acr-name).azurecr.io'
           dockerComposeFile: api/docker-compose.yml
-          projectName: api
+          projectName: api-$(System.StageName)
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
           dockerComposeFileArgs: |
             MYSQL_HOST=$(ipMysql)
@@ -157,7 +166,7 @@ stages:
 
       - template: ../templates/storage-account/download.yml
         parameters:        
-          file_name: 'tf-api.tar'
+          file_name: 'tf-api-$(System.StageName).tar'
           storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
           working_dir: $(System.DefaultWorkingDirectory)/${{ parameters.apiDir }}
@@ -165,14 +174,14 @@ stages:
       - task: ExtractFiles@1
         continueOnError: true
         inputs:
-          archiveFilePatterns: '$(System.DefaultWorkingDirectory)/${{ parameters.apiDir }}/tf-api.tar'
+          archiveFilePatterns: '$(System.DefaultWorkingDirectory)/${{ parameters.apiDir }}/tf-api-$(System.StageName).tar'
           destinationFolder: $(System.DefaultWorkingDirectory)/${{ parameters.apiDir }}
           cleanDestinationFolder: false
 
       - template: ../templates/steps/terraform.yml
         parameters:
           out_file: "main"
-          input_vars:  '-var "app_name=${{ parameters.app_name }}-$(acr-name)" -var "subscription_id=$(SUBSCRIPTION-ID)" -var "client_id=$(CLIENT-ID)" -var "client_secret=$(CLIENT-SECRET)" -var "tenant_id=$(TENANT-ID)" -var "acr_username=$(acr-name)" -var "acr_password=$(acr-admin-password)" -var "acr_server=$(acr-name).azurecr.io"'
+          input_vars:  '-var "app_name=${{ parameters.app_name }}-$(acr-name)-$(System.StageName)" -var "subscription_id=$(SUBSCRIPTION-ID)" -var "client_id=$(CLIENT-ID)" -var "client_secret=$(CLIENT-SECRET)" -var "tenant_id=$(TENANT-ID)" -var "acr_username=$(acr-name)" -var "acr_password=$(acr-admin-password)" -var "acr_server=$(acr-name).azurecr.io"'
           work_dir: ${{ parameters.apiDir }}
           terraformVersion: 0.14.7
 
@@ -180,13 +189,13 @@ stages:
         inputs:
           rootFolderOrFile: ${{ parameters.apiDir }}/terraform.tfstate
           archiveType: 'tar'
-          archiveFile: ${{ parameters.apiDir }}/tf-api.tar
+          archiveFile: ${{ parameters.apiDir }}/tf-api-$(System.StageName).tar
           replaceExistingArchive: true
           includeRootFolder: false
 
       - template: ../templates/storage-account/upload.yml
         parameters:
-          file_name: 'tf-api.tar'
+          file_name: 'tf-api-$(System.StageName).tar'
           storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
           working_dir: ${{ parameters.apiDir }}
