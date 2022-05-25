@@ -27,4 +27,8 @@ COPY . .
 ARG MYSQL_HOST
 ENV MYSQL_HOST=$MYSQL_HOST
 
+RUN echo "----- key is 1 $MYSQL_HOST"
+RUN echo "----- key is 11 $(ipMysql)"
+RUN echo "----- key is 111 ${MYSQL_HOST}"
+
 CMD npm start
