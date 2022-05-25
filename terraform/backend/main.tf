@@ -12,7 +12,7 @@ locals {
 
 module "backend" {
   source            = "./modules"
-  rg_name           = "${local.project_name}-rg-backend"
+  rg_name           = "${local.project_name}-rg-backend-${var.environment}"
   rg_location       = "West Europe"
   acr_name          = "${local.random_result}acr"
   acr_sku           = "Basic"
