@@ -6,6 +6,8 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
+      args:
+        - MYSQL_HOST=${MYSQL_HOST}
     volumes:
        - "./api:/home/node/app"
     ports:
