@@ -103,39 +103,45 @@ stages:
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
           working_dir: ${{ parameters.databaseDir }}
       
-      # - task: CopyFiles@2
-      #   inputs:
-      #     SourceFolder: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}'
-      #     Contents: |
-      #       terraform.tfstate
-      #       output.json
-      #     TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}'
+          Contents: |
+            output.json
+          TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
-      # - task: PublishBuildArtifacts@1
-      #   inputs:
-      #     pathToPublish: '$(Build.ArtifactStagingDirectory)'
-      #     artifactName: 'tfstates-database'
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathToPublish: '$(Build.ArtifactStagingDirectory)'
+          artifactName: 'tfstates-database-$(System.StageName)'
 
     - job: NodeJS
       dependsOn: MySql
       steps:
 
-      # - task: DownloadBuildArtifacts@0
-      #   displayName: 'MySql artifacts'
-      #   inputs:
-      #     buildType: 'current'
-      #     downloadType: 'single'
-      #     artifactName: 'tfstates-database'
-      #     downloadPath: '$(System.ArtifactsDirectory)'
+      - task: PowerShell@2
+        displayName: 'MySql ip'
+        inputs:
+          targetType: 'inline'
+          script: |
+            Write-Host "$(ipMysql)"
 
-      # - task: PowerShell@2
-      #   displayName: 'MySql ip'
-      #   inputs:
-      #     targetType: 'inline'
-      #     script: |
-      #       $data = Get-content $(System.ArtifactsDirectory)/tfstates-database/output.json | out-string | ConvertFrom-Json
-      #       $ip_address = $data.mysql_ip_address.value
-      #       Write-Host "##vso[task.setvariable variable=ipMysql;]$ip_address"
+      - task: DownloadBuildArtifacts@0
+        displayName: 'MySql artifacts'
+        inputs:
+          buildType: 'current'
+          downloadType: 'single'
+          artifactName: 'tfstates-database-$(System.StageName)'
+          downloadPath: '$(System.ArtifactsDirectory)'
+
+      - task: PowerShell@2
+        displayName: 'MySql ip'
+        inputs:
+          targetType: 'inline'
+          script: |
+            $data = Get-content $(System.ArtifactsDirectory)/tfstates-database-$(System.StageName)/output.json | out-string | ConvertFrom-Json
+            $ip_address = $data.mysql_ip_address.value
+            Write-Host "##vso[task.setvariable variable=ipMysql;]$ip_address"
 
       - task: DockerCompose@0
         displayName: Build services
