@@ -213,4 +213,7 @@ stages:
           scriptType: 'pscore'
           scriptLocation: 'inlineScript'
           inlineScript: |
-            az storage blob download --account-name ${{ parameters.storage_account_name }} --container-name ${{ parameters.container_name }} --name ${{ parameters.file_name }} --file ${{ parameters.file_name }} --auth-mode key
+            $data = Get-content ${{ parameters.apiDir }}/output.json | out-string | ConvertFrom-Json
+            $rg_name = $data.rg_name.value
+            $acg_name = $data.acg_name.value
+            az container restart --name $acg_name --resource-group $rg_name
