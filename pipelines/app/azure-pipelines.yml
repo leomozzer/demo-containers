@@ -119,13 +119,6 @@ stages:
       dependsOn: MySql
       steps:
 
-      - task: PowerShell@2
-        displayName: 'MySql ip'
-        inputs:
-          targetType: 'inline'
-          script: |
-            Write-Host "$(ipMysql)"
-
       - task: DownloadBuildArtifacts@0
         displayName: 'MySql artifacts'
         inputs:
