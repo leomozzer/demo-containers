@@ -18,13 +18,12 @@
 # #EXPOSE 8080
 # #CMD [ "node", "src/index.js" ]
 # CMD npm start
+ARG MYSQL_HOST
+ENV MYSQL_HOST=$MYSQL_HOST
+
 FROM node:latest
 WORKDIR /home/node/app
 COPY package.json ./
 RUN npm install
 COPY . .
-
-ARG MYSQL_HOST
-ENV MYSQL_HOST=$MYSQL_HOST
-
 CMD npm start
