@@ -23,6 +23,8 @@ parameters:
     default: "terraform/app/database"
   - name: apiDir
     default: "terraform/app/api"
+  - name: websiteDir
+    default: "terraform/app/website"
 
 variables:
   - group: "demo-containers-group"
@@ -190,6 +192,18 @@ stages:
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
           working_dir: ${{ parameters.apiDir }}
 
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: '$(System.DefaultWorkingDirectory)/${{ parameters.apiDir }}'
+          Contents: |
+            output.json
+          TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathToPublish: '$(Build.ArtifactStagingDirectory)'
+          artifactName: 'tfstates-api-$(System.StageName)'
+
       - task: AzureCLI@2
         displayName: 'Restart Container'
         inputs:
@@ -205,6 +219,23 @@ stages:
     - job: website
       dependsOn: api
       steps:
+
+      - task: DownloadBuildArtifacts@0
+        displayName: 'api artifacts'
+        inputs:
+          buildType: 'current'
+          downloadType: 'single'
+          artifactName: 'tfstates-api-$(System.StageName)'
+          downloadPath: '$(System.ArtifactsDirectory)'
+
+      - task: PowerShell@2
+        displayName: 'api ip'
+        inputs:
+          targetType: 'inline'
+          script: |
+            $data = Get-content $(System.ArtifactsDirectory)/tfstates-api-$(System.StageName)/output.json | out-string | ConvertFrom-Json
+            $ip_address = $data.api_ip_address.value
+            Write-Host "##vso[task.setvariable variable=ipApi;]$ip_address"
         
       - task: DockerCompose@0
         displayName: Build services
@@ -215,6 +246,9 @@ stages:
           dockerComposeFile: website/docker-compose.yml
           projectName: website-$(System.StageName)
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
+          dockerComposeFileArgs: |
+            BACKEND_ADDRESS=$(ipApi)
+            BACKEND_PORT=9001
           
       - task: DockerCompose@0
         displayName: Push services
@@ -226,3 +260,54 @@ stages:
           dockerComposeFile: website/docker-compose.yml
           projectName: website-$(System.StageName)
           qualifyImageNames: ${{ parameters.qualifyImageNames }}
+          dockerComposeFileArgs: |
+            BACKEND_ADDRESS=$(ipApi)
+            BACKEND_PORT=9001
+
+      - template: ../templates/storage-account/download.yml
+        parameters:        
+          file_name: 'tf-website-$(System.StageName).tar'
+          storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
+          container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
+          working_dir: $(System.DefaultWorkingDirectory)/${{ parameters.websiteDir }}
+
+      - task: ExtractFiles@1
+        continueOnError: true
+        inputs:
+          archiveFilePatterns: '$(System.DefaultWorkingDirectory)/${{ parameters.websiteDir }}/tf-api-$(System.StageName).tar'
+          destinationFolder: $(System.DefaultWorkingDirectory)/${{ parameters.websiteDir }}
+          cleanDestinationFolder: false
+
+      - template: ../templates/steps/terraform.yml
+        parameters:
+          out_file: "acg-api-$(System.StageName)"
+          input_vars:  '-var "app_name=${{ parameters.app_name }}-$(acr-name)" -var "environment=$(System.StageName)" -var "subscription_id=$(SUBSCRIPTION-ID)" -var "client_id=$(CLIENT-ID)" -var "client_secret=$(CLIENT-SECRET)" -var "tenant_id=$(TENANT-ID)" -var "acr_username=$(acr-name)" -var "acr_password=$(acr-admin-password)" -var "acr_server=$(acr-name).azurecr.io"'
+          work_dir: ${{ parameters.websiteDir }}
+          terraformVersion: 0.14.7
+
+      - task: ArchiveFiles@2
+        inputs:
+          rootFolderOrFile: ${{ parameters.websiteDir }}/terraform.tfstate
+          archiveType: 'tar'
+          archiveFile: ${{ parameters.websiteDir }}/tf-website-$(System.StageName).tar
+          replaceExistingArchive: true
+          includeRootFolder: false
+
+      - template: ../templates/storage-account/upload.yml
+        parameters:
+          file_name: 'tf-api-$(System.StageName).tar'
+          storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
+          container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
+          working_dir: ${{ parameters.websiteDir }}
+
+      - task: AzureCLI@2
+        displayName: 'Restart Container'
+        inputs:
+          azureSubscription: 'AzureDevOps'
+          scriptType: 'pscore'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            $data = Get-content ${{ parameters.websiteDir }}/output.json | out-string | ConvertFrom-Json
+            $rg_name = $data.rg_name.value
+            $acg_name = $data.acg_name.value
+            az container restart --name $acg_name --resource-group $rg_name
