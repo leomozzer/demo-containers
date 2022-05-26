@@ -9,7 +9,7 @@ services:
       args:
         - BACKEND_ADDRESS=${BACKEND_ADDRESS}
     volumes:
-       - ".:/var/www/html"
+       - "./website:/var/www/html"
     ports:
        - 8888:80
     restart: "always"
