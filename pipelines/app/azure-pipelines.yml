@@ -11,6 +11,7 @@ trigger:
     - api
     - website
     - pipelines/app/azure-pipelines.yml
+    - terraform/app/
 
 parameters:
   - name: app_name
