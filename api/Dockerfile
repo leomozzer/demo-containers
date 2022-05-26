@@ -27,6 +27,6 @@ COPY . .
 ARG MYSQL_HOST
 ENV MYSQL_HOST=$MYSQL_HOST
 
-RUN echo "MySql address is $MYSQL_HOST"
+RUN echo "mysql address is $MYSQL_HOST"
 
 CMD npm start

@@ -80,43 +80,44 @@ docker-compose down
 ## Terraform
 
 ### Backend
-* Add the values below in the file `terraform.tfvars`
+* Create a new file called `variables.tfvars` in the terraform/backend folder
+* Add the values below in the new file
 ```
+#Account
 subscription_id = ""
 client_id       = ""
 client_secret   = ""
 tenant_id       = ""
+
+#App
+environment = "dev"
+app_name    = "demo-containers"
 ```
 * Use the commands below:
 ```
 terraform init
-terraform plan -var-file="terraform.tfvars" -out=main.plan
+terraform plan -var-file="variables.tfvars" -out=main.plan
 terraform apply -auto-approve main.plan
 ```
 
-
-## Azure
-
-### api
+## Docker Compose and Azure Manually
+* [Deploy a multi-container group using Docker Compose](https://docs.microsoft.com/en-us/azure/container-instances/tutorial-docker-compose)
 * Use the terraform/backend to create the Azure Container Registry (ACR)
 * Get the credentials of the ACR
 * Use the command `docker login <acrName>.azurecr.io` and provide the username and password
-
-## Docker Compose and Azure Manually
-* [Deploy a multi-container group using Docker Compose](https://docs.microsoft.com/en-us/azure/container-instances/tutorial-docker-compose)
 * az acr login --name <acrName>
+### mysql
 * docker-compose up --build -d
 * docker-compose down
 * docker-compose push
 * Create a container instance to MySql
-    * Create a vnet inside
     * Use the port 3306
 * Open the Container instance of the mysql
 * connect to it and run the command in the mysql
+### api
 * Get the ip address in of the ACI mysql
 * Add in the api connect mysql
 * Create a container instance to api
-    * Create a vnet inside
     * Use the port 9001
 * docker-compose up --build -d
 * docker-compose down

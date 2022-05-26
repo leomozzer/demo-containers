@@ -51,5 +51,5 @@ app.get('/people', function (req, res) {
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
-  console.log(`MySql host: ${process.env.MYSQL_HOST}`)
+  console.log(`Mysql host: ${process.env.MYSQL_HOST}`)
 })
