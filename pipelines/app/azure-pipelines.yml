@@ -275,7 +275,7 @@ stages:
       - task: ExtractFiles@1
         continueOnError: true
         inputs:
-          archiveFilePatterns: '$(System.DefaultWorkingDirectory)/${{ parameters.websiteDir }}/tf-api-$(System.StageName).tar'
+          archiveFilePatterns: '$(System.DefaultWorkingDirectory)/${{ parameters.websiteDir }}/tf-website-$(System.StageName).tar'
           destinationFolder: $(System.DefaultWorkingDirectory)/${{ parameters.websiteDir }}
           cleanDestinationFolder: false
 
@@ -296,7 +296,7 @@ stages:
 
       - template: ../templates/storage-account/upload.yml
         parameters:
-          file_name: 'tf-api-$(System.StageName).tar'
+          file_name: 'tf-website-$(System.StageName).tar'
           storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
           working_dir: ${{ parameters.websiteDir }}
