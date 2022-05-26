@@ -11,7 +11,7 @@ services:
     volumes:
        - "./website:/var/www/html"
     ports:
-       - 8888:80
+       - 8888:8888
     restart: "always"
     environment:
       BACKEND_ADDRESS: ${BACKEND_ADDRESS}
