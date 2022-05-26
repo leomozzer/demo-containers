@@ -7,7 +7,8 @@
 </head>
 <body>
   <?php
-    $result = file_get_contents("http://api:9001/people");
+    $address = .getenv("BACKEND_ADDRESS") + "/" + .getenv("BACKEND_PORT");
+    $result = file_get_contents($address);
     $people = json_decode($result);
   ?>
   
