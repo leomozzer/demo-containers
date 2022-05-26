@@ -119,17 +119,16 @@ stages:
           buildType: 'current'
           downloadType: 'single'
           artifactName: 'tfstates-database-$(System.StageName)'
-          downloadPath: '$(System.ArtifactsDirectory)'
+          downloadPath: '$(System.DefaultWorkingDirectory)'
 
       - task: PowerShell@2
         displayName: 'mysql ip'
         inputs:
           targetType: 'inline'
           script: |
-            $data = Get-content $(System.ArtifactsDirectory)/tfstates-database-$(System.StageName)/output.json | out-string | ConvertFrom-Json
+            $data = Get-content $(System.DefaultWorkingDirectory)/tfstates-database-$(System.StageName)/output.json | out-string | ConvertFrom-Json
             $ip_address = $data.mysql_ip_address.value
             Write-Host "##vso[task.setvariable variable=ipMysql;]$ip_address"
-            Remove-Item $(System.ArtifactsDirectory)/tfstates-database-$(System.StageName)
             
       - task: DockerCompose@0
         displayName: Build services
@@ -228,17 +227,16 @@ stages:
           buildType: 'current'
           downloadType: 'single'
           artifactName: 'tfstates-api-$(System.StageName)'
-          downloadPath: '$(System.ArtifactsDirectory)'
+          downloadPath: '$(System.DefaultWorkingDirectory)'
 
       - task: PowerShell@2
         displayName: 'api ip'
         inputs:
           targetType: 'inline'
           script: |
-            $data = Get-content $(System.ArtifactsDirectory)/tfstates-api-$(System.StageName)/output.json | out-string | ConvertFrom-Json
+            $data = Get-content $(System.DefaultWorkingDirectory)/tfstates-api-$(System.StageName)/output.json | out-string | ConvertFrom-Json
             $ip_address = $data.api_ip_address.value
             Write-Host "##vso[task.setvariable variable=ipApi;]$ip_address"
-            Remove-Item $(System.ArtifactsDirectory)/tfstates-api-$(System.StageName)
         
       - task: DockerCompose@0
         displayName: Build services
