@@ -15,7 +15,7 @@ module "acg_website" {
   acr_server      = var.acr_server
   container_name  = "website-container"
   container_image = "${var.acr_server}/website:latest"
-  port            = 8888
+  port            = 80
   protocol        = "TCP"
 }
 
