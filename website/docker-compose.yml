@@ -8,6 +8,7 @@ services:
       dockerfile: Dockerfile
       args:
         - BACKEND_ADDRESS=${BACKEND_ADDRESS}
+        - BACKEND_PORT=${BACKEND_PORT}
     volumes:
        - "./website:/var/www/html"
     ports:
@@ -15,3 +16,4 @@ services:
     restart: "always"
     environment:
       BACKEND_ADDRESS: ${BACKEND_ADDRESS}
+      BACKEND_PORT: ${BACKEND_PORT}

@@ -8,7 +8,7 @@ ARG BACKEND_PORT
 ENV BACKEND_PORT=$BACKEND_PORT
 
 RUN echo "backend address is $BACKEND_ADDRESS"
-RUN echo "backend address is $BACKEND_PORT"
+RUN echo "backend port is $BACKEND_PORT"
 
 COPY index.php .
 COPY . .
