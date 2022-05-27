@@ -7,12 +7,8 @@
 </head>
 <body>
   <?php
-    $port = getenv("BACKEND_PORT");
-    echo $port;
-    $address = getenv("BACKEND_ADDRESS") . ":" .$port . "/people";
+    $address = "http://" getenv("BACKEND_ADDRESS") . ":" . getenv("BACKEND_PORT"); . "/people";
     echo $address;
-    #$address = "20.31.81.254" + ":" + "9001" + "/people";
-    #$result = file_get_contents($address);
     $result = file_get_contents($address);
     $people = json_decode($result);
   ?>
