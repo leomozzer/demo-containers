@@ -172,6 +172,7 @@ TENANT-ID
 acr-admin-password -> value of the password of the ACR
 acr-name -> value of the user of the ACR
 ```
+* Create a new pipeline using the `pipelines/app/azure-pipelines.yml`
 * Run the pipeline and allow it to access the items needed
 
 
