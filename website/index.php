@@ -7,7 +7,7 @@
 </head>
 <body>
   <?php
-    $address = "http://" . getenv("BACKEND_ADDRESS") . ":" . getenv("BACKEND_PORT"); . "/people";
+    $address = "http://" .getenv("BACKEND_ADDRESS") . ":" .getenv("BACKEND_PORT"); . "/people";
     echo $address;
     $result = file_get_contents($address);
     $people = json_decode($result);
