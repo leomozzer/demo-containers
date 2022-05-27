@@ -12,7 +12,8 @@
     $address = getenv("BACKEND_ADDRESS") . ":" .$port . "/people";
     echo $address;
     #$address = "20.31.81.254" + ":" + "9001" + "/people";
-    $result = file_get_contents($address);
+    #$result = file_get_contents($address);
+    $result = file_get_contents("20.31.81.254:9001/people");
     $people = json_decode($result);
   ?>
   
