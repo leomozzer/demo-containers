@@ -127,3 +127,51 @@ terraform apply -auto-approve main.plan
 
 ## Docker Compose and Azure Pipeline
 
+### Configuration
+* Create a new service connection with the `Azure Resource Manager` in the subscription level
+* Access it and create a new client secret (save the info)
+* Access the subscription where the service connection has access
+* In the `Access control` attach the following permissions with the recently created service connection
+```
+AcrImageSigner
+AcrPull
+AcrPush
+Contributor
+Storage Account Contributor
+```
+* Create a resource group
+* Create an storage account and a container in the resource group
+* Create an key vault in the resource group
+* Add the following secrets in the key vault
+```
+CLIENT-ID
+CLIENT-SECRET
+STORAGE-ACCOUNT-CONTAINER
+STORAGE-ACCOUNT-KEY
+STORAGE-ACCOUNT-NAME
+SUBSCRIPTION-ID
+TENANT-ID
+```
+* Access the `Library` in the `Pipelines`
+* Create a new variables group called `demo-containers-group`
+* Enable the `Link secrets from an Azure Key Vault as variables`
+* Use the recently key vault created
+* Attach the secrets that were created
+
+
+### Backend pipeline
+* Create a new Azure pipeline using the `pipelines/backend/azure-pipelines.yml`
+* Run the pipeline and allow it to access the items needed
+* Get the credentials of the ACR that was created
+
+### App pipeline
+* Access the `Library` in the `Pipelines`
+* Create a new variables group called `demo-containers-acr-group`
+* Add the following variables
+```
+acr-admin-password -> value of the password of the ACR
+acr-name -> value of the user of the ACR
+```
+* Run the pipeline and allow it to access the items needed
+
+
