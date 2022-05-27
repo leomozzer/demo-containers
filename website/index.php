@@ -7,7 +7,9 @@
 </head>
 <body>
   <?php
-    $address = getenv("BACKEND_ADDRESS") . ":" . getenv("BACKEND_PORT") . "/people";
+    $port = getenv("BACKEND_PORT");
+    echo $port;
+    $address = getenv("BACKEND_ADDRESS") . ":" .$port . "/people";
     echo $address;
     #$address = "20.31.81.254" + ":" + "9001" + "/people";
     $result = file_get_contents($address);
