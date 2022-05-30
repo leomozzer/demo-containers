@@ -1,7 +1,7 @@
 version : '3'
 services:
   mysql:
-    image: <acrName>.azurecr.io/mysql
+    image: mysql
     container_name: mysql-container
     build: 
       context: ./db
@@ -13,25 +13,32 @@ services:
        - 3306:3306
 
   api:
-    image: <acrName>.azurecr.io/api
+    image: api
     container_name: api-container
     build: 
       context: ./api
       dockerfile: Dockerfile
+      args:
+        - MYSQL_HOST="mysql"
     volumes:
        - "./api:/home/node/app"
     ports:
        - 9001:9001
+    environment:
+      MYSQL_HOST: "mysql"
     restart: "always"
     depends_on:
       - "mysql"
 
   website:
-    image: <acrName>.azurecr.io/website
+    image: website
     container_name: website-container
     build: 
       context: ./website
       dockerfile: Dockerfile
+      args:
+        - BACKEND_ADDRESS="api"
+        - BACKEND_PORT=9001
     volumes:
        - "./website:/var/www/html"
     ports:
@@ -39,3 +46,6 @@ services:
     restart: "always"
     depends_on:
       - "api"
+    environment:
+      BACKEND_ADDRESS: "api"
+      BACKEND_PORT: 9001
