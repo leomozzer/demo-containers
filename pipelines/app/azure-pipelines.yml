@@ -17,7 +17,7 @@ parameters:
   - name: app_name
     default: "demo-containers"
   - name: azureSubscriptionEndpoint
-    default: AzureDevOps
+    default: SC-AzureDevOps
   - name: qualifyImageNames
     default: true
   - name: databaseDir
@@ -67,6 +67,7 @@ stages:
           storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
           working_dir: '$(System.DefaultWorkingDirectory)/${{ parameters.databaseDir }}'
+          azure_subscription: 'SC-AzureDevOps'
 
       - task: ExtractFiles@1
         continueOnError: true
@@ -96,6 +97,7 @@ stages:
           storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
           working_dir: ${{ parameters.databaseDir }}
+          azure_subscription: 'SC-AzureDevOps'
       
       - task: CopyFiles@2
         inputs:
@@ -163,6 +165,7 @@ stages:
           storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
           working_dir: $(System.DefaultWorkingDirectory)/${{ parameters.apiDir }}
+          azure_subscription: 'SC-AzureDevOps'
 
       - task: ExtractFiles@1
         continueOnError: true
@@ -192,6 +195,7 @@ stages:
           storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
           working_dir: ${{ parameters.apiDir }}
+          azure_subscription: 'SC-AzureDevOps'
 
       - task: CopyFiles@2
         inputs:
@@ -271,6 +275,7 @@ stages:
           storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
           working_dir: $(System.DefaultWorkingDirectory)/${{ parameters.websiteDir }}
+          azure_subscription: 'SC-AzureDevOps'
 
       - task: ExtractFiles@1
         continueOnError: true
@@ -300,6 +305,7 @@ stages:
           storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
           working_dir: ${{ parameters.websiteDir }}
+          azure_subscription: 'SC-AzureDevOps'
 
       - task: AzureCLI@2
         displayName: 'Restart Container'

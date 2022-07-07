@@ -3,6 +3,7 @@ parameters:
   - name: storage_account_name
   - name: container_name
   - name: working_dir
+  - name: azure_subscription
 
 steps:
   - task: AzureCLI@2
@@ -10,7 +11,7 @@ steps:
     continueOnError: true
     inputs:
       workingDirectory: '${{ parameters.working_dir }}'
-      azureSubscription: 'AzureDevOps'
+      azureSubscription: '${{ parameters.azure_subscription }}'
       scriptType: 'pscore'
       scriptLocation: 'inlineScript'
       inlineScript: |

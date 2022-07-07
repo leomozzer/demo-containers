@@ -36,6 +36,7 @@ stages:
           storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
           working_dir: ${{ parameters.backendDir }}
+          azure_subscription: 'SC-AzureDevOps'
 
       - task: ExtractFiles@1
         continueOnError: true
@@ -65,3 +66,4 @@ stages:
           working_dir: ${{ parameters.backendDir }}
           storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
           container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
+          azure_subscription: 'SC-AzureDevOps'
