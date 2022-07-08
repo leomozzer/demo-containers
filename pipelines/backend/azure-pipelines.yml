@@ -30,6 +30,11 @@ stages:
 
     - job: 'ACR_Setup'
       steps:
+      - task: InfracostSetup@1
+        inputs:
+          apiKey: '$(INFRACOST-KEY)'
+          version: '0.10.x'
+          
       - template: ../templates/storage-account/download.yml
         parameters:        
           file_name: 'tf-acr-$(System.StageName).tar'
