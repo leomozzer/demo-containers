@@ -18,7 +18,7 @@ resource "azurerm_key_vault" "keyvault" {
   enabled_for_disk_encryption = true
   tenant_id                   = data.azurerm_client_config.current.tenant_id
   soft_delete_retention_days  = 7
-  purge_protection_enabled    = false
+  purge_protection_enabled    = true
 
   sku_name = "standard"
 
@@ -46,12 +46,18 @@ resource "azurerm_key_vault" "keyvault" {
 
     storage_permissions = ["Get", "List", "Update", "Purge"]
   }
+
+  network_acls {
+    bypass = "AzureServices"
+    default_action = "Deny"
+  }
 }
 
 resource "azurerm_key_vault_secret" "secret_acr_name" {
   name         = "acr-name"
   value        = azurerm_container_registry.acr.name
   key_vault_id = azurerm_key_vault.keyvault.id
+  content_type = ""
 }
 
 resource "azurerm_key_vault_secret" "secret_arc_admin_user" {
