@@ -53,13 +53,14 @@ resource "azurerm_key_vault" "keyvault" {
   }
 }
 
+#tfsec:ignore:azure-keyvault-content-type-for-secret #tfsec:ignore:azure-keyvault-ensure-secret-expiry
 resource "azurerm_key_vault_secret" "secret_acr_name" {
   name         = "acr-name"
   value        = azurerm_container_registry.acr.name
   key_vault_id = azurerm_key_vault.keyvault.id
-  content_type = ""
 }
 
+#tfsec:ignore:azure-keyvault-content-type-for-secret #tfsec:ignore:azure-keyvault-ensure-secret-expiry
 resource "azurerm_key_vault_secret" "secret_arc_admin_user" {
   count        = var.acr_admin_enabled ? 1 : 0
   name         = "arc-admin-user"
@@ -67,6 +68,7 @@ resource "azurerm_key_vault_secret" "secret_arc_admin_user" {
   key_vault_id = azurerm_key_vault.keyvault.id
 }
 
+#tfsec:ignore:azure-keyvault-content-type-for-secret #tfsec:ignore:azure-keyvault-ensure-secret-expiry
 resource "azurerm_key_vault_secret" "secret_acr_admin_password" {
   count        = var.acr_admin_enabled ? 1 : 0
   name         = "acr-admin-password"
