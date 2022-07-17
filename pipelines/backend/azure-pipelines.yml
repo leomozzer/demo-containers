@@ -25,6 +25,17 @@ pool:
   vmImage: ubuntu-latest
 
 stages:
+  - stage: QualityCheckStage
+    displayName: Quality Check Stage
+    jobs:
+      - job: TFSecJobMain
+        displayName: TFSec Scan terraform-main
+        steps:
+          - template: ../templates/steps/terraform-tfsec.yaml
+            parameters:
+              artifact_name: ${{ parameters.backendDir }}
+              working_path: ${{ variables.tf_script_path }}
+
   - stage: dev
     jobs:
 
