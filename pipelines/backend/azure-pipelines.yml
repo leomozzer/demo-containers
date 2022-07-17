@@ -14,7 +14,7 @@ trigger:
 
 parameters:
   - name: backendDir
-    default: "terraform/backend"
+    default: "$(System.DefaultWorkingDirectory)/terraform/backend"
   - name: app_name
     default: "demo-containers"
 
