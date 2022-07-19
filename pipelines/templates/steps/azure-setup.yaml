@@ -3,6 +3,7 @@ parameters:
   resource_group_name: ""
   storage_account_name: ""
   service_connection_name: ""
+  resource_group_location: ""
 
 steps:
   - task: AzureCLI@2
