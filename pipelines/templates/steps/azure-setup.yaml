@@ -13,7 +13,7 @@ steps:
       scriptType: 'bash'
       scriptLocation: inlineScript  
       inlineScript: |
-        az group create -l ${{ parameters.resource_group_location }} -n ${{ parameters.resource_group_name }}
+        az group create --location ${{ parameters.resource_group_location }} --name ${{ parameters.resource_group_name }}
 
   - task: AzureCLI@2
     displayName: 'Create storage account for Terraform'
