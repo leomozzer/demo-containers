@@ -1,3 +1,5 @@
+name: Build $(build_counter)
+
 trigger:
   batch: true
   branches:
