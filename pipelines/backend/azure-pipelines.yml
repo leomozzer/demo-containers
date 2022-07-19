@@ -19,6 +19,17 @@ parameters:
     default: "demo-containers"
 
 variables:
+  build_counter: $[counter('build-counter-$(RELEASE_NAME)', 1)]
+  - name: app_name
+    default: "demo-containers"
+  service_connection_name: "SC-AzureDevOps" 
+  tfstate_storage_account_resource_group_name: "demo-containers-dev"
+  tfstate_storage_account_name: ""stacdev"
+  tf_version: 1.1.7
+  tf_script_path: "$(System.DefaultWorkingDirectory)/terraform/backend"
+  #tf_modules_path: '$(System.DefaultWorkingDirectory)/terraform-modules'
+
+variables:
   - group: "demo-containers-group"
 
 pool:
@@ -34,52 +45,64 @@ stages:
           - template: ../templates/steps/tfsec.yaml
             parameters:
               artifact_name: 'terraform-backend'
-              working_path: ${{ parameters.backendDir }}
+              working_path: ${{ variables.tf_script_path }}
 
-  - stage: dev
+  - stage: Plan
     jobs:
+      - job: dev
+        displayName: Plan Dev Environment
+        steps:
+        - template: ../templates/steps/terraform-plan.yaml
+          parameters: 
+            stage: dev
+            tfstate_storage_account_resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
+            service_connection_name: ${{ variables.service_connection_name }}
+            tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
+            tf_version: ${{ variables.tf_version }}
+            project_name: ${{ variables.project_name }}
+            working_path: ${{ variables.tf_script_path }}
 
-    - job: 'ACR_Setup'
-      steps:
-      - task: InfracostSetup@1
-        inputs:
-          apiKey: '$(INFRACOST-KEY)'
-          version: '0.10.x'
+    # - job: 'ACR_Setup'
+    #   steps:
+    #   - task: InfracostSetup@1
+    #     inputs:
+    #       apiKey: '$(INFRACOST-KEY)'
+    #       version: '0.10.x'
           
-      - template: ../templates/storage-account/download.yml
-        parameters:        
-          file_name: 'tf-acr-$(System.StageName).tar'
-          storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
-          container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
-          working_dir: ${{ parameters.backendDir }}
-          azure_subscription: 'SC-AzureDevOps'
+      # - template: ../templates/storage-account/download.yml
+      #   parameters:        
+      #     file_name: 'tf-acr-$(System.StageName).tar'
+      #     storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
+      #     container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
+      #     working_dir: ${{ parameters.backendDir }}
+      #     azure_subscription: 'SC-AzureDevOps'
 
-      - task: ExtractFiles@1
-        continueOnError: true
-        inputs:
-          archiveFilePatterns: '$(System.DefaultWorkingDirectory)/${{ parameters.backendDir }}/tf-acr-$(System.StageName).tar'
-          destinationFolder: '$(System.DefaultWorkingDirectory)/${{ parameters.backendDir }}'
-          cleanDestinationFolder: false
+      # - task: ExtractFiles@1
+      #   continueOnError: true
+      #   inputs:
+      #     archiveFilePatterns: '$(System.DefaultWorkingDirectory)/${{ parameters.backendDir }}/tf-acr-$(System.StageName).tar'
+      #     destinationFolder: '$(System.DefaultWorkingDirectory)/${{ parameters.backendDir }}'
+      #     cleanDestinationFolder: false
       
-      - template: ../templates/steps/terraform.yml
-        parameters:
-          out_file: "acr-$(System.StageName)"
-          input_vars:  '-var "app_name=${{ parameters.app_name }}" -var "environment=$(System.StageName)" -var "subscription_id=$(SUBSCRIPTION-ID)" -var "client_id=$(CLIENT-ID)" -var "client_secret=$(CLIENT-SECRET)" -var "tenant_id=$(TENANT-ID)"'
-          work_dir: ${{ parameters.backendDir }}
-          terraformVersion: 0.14.7
+      # - template: ../templates/steps/terraform.yml
+      #   parameters:
+      #     out_file: "acr-$(System.StageName)"
+      #     input_vars:  '-var "app_name=${{ parameters.app_name }}" -var "environment=$(System.StageName)" -var "subscription_id=$(SUBSCRIPTION-ID)" -var "client_id=$(CLIENT-ID)" -var "client_secret=$(CLIENT-SECRET)" -var "tenant_id=$(TENANT-ID)"'
+      #     work_dir: ${{ parameters.backendDir }}
+      #     terraformVersion: 0.14.7
 
-      - task: ArchiveFiles@2
-        inputs:
-          rootFolderOrFile: ${{ parameters.backendDir }}/terraform.tfstate
-          archiveType: 'tar'
-          archiveFile: ${{ parameters.backendDir }}/tf-acr-$(System.StageName).tar
-          replaceExistingArchive: true
-          includeRootFolder: false
+      # - task: ArchiveFiles@2
+      #   inputs:
+      #     rootFolderOrFile: ${{ parameters.backendDir }}/terraform.tfstate
+      #     archiveType: 'tar'
+      #     archiveFile: ${{ parameters.backendDir }}/tf-acr-$(System.StageName).tar
+      #     replaceExistingArchive: true
+      #     includeRootFolder: false
 
-      - template: ../templates/storage-account/upload.yml
-        parameters:
-          file_name: 'tf-acr-$(System.StageName).tar'
-          working_dir: ${{ parameters.backendDir }}
-          storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
-          container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
-          azure_subscription: 'SC-AzureDevOps'
+      # - template: ../templates/storage-account/upload.yml
+      #   parameters:
+      #     file_name: 'tf-acr-$(System.StageName).tar'
+      #     working_dir: ${{ parameters.backendDir }}
+      #     storage_account_name: '$(STORAGE-ACCOUNT-NAME)'
+      #     container_name: '$(STORAGE-ACCOUNT-CONTAINER)'
+      #     azure_subscription: 'SC-AzureDevOps'
