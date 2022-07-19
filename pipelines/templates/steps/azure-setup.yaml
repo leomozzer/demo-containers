@@ -1,0 +1,26 @@
+# Leave parameters empty. Will be filled by terraform-pipeline.yaml
+parameters:
+  resource_group_name: ""
+  storage_account_name: ""
+  service_connection_name: ""
+
+steps:
+  - task: AzureCLI@2
+    displayName: 'Create resource group for Terraform'
+    inputs:
+      azureSubscription: ${{ parameters.service_connection_name }}
+      scriptType: 'bash'
+      scriptLocation: inlineScript  
+      inlineScript: |
+        az group create -l ${{ parameters.resource_group_location }} -n ${{ parameters.resource_group_name }}
+
+  - task: AzureCLI@2
+    displayName: 'Create storage account for Terraform'
+    inputs:
+      azureSubscription: ${{ parameters.service_connection_name }}
+      scriptType: 'bash'
+      scriptLocation: inlineScript  
+      inlineScript: |
+        az storage account create --resource-group ${{ parameters.resource_group_name }} --name ${{ parameters.storage_account_name }} --sku Standard_LRS --kind StorageV2 --encryption-services blob --access-tier Cool --allow-blob-public-access false
+        az storage container create --name states --account-name ${{ parameters.storage_account_name }}
+        az storage container create --name plans --account-name ${{ parameters.storage_account_name }}
