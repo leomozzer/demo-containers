@@ -55,6 +55,7 @@ stages:
           parameters:
             resource_group_name: ${{ variables.project_name }}-rg
             storage_account_name: "storageaccount"
+            resource_group_location: "westus"
             service_connection_name: ${{ variables.service_connection_name }}
 
         # - template: ../templates/steps/terraform-plan.yaml
