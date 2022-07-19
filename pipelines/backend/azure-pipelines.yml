@@ -51,7 +51,7 @@ stages:
       - job: dev
         displayName: Plan Dev Environment
         steps:
-        - template: ../templates/steps/terraform-plan.yaml
+        - template: ../templates/steps/azure-setup.yaml
           parameters:
             resource_group_name: ${{ variables.project_name }}-rg
             storage_account_name: "storageaccount"
