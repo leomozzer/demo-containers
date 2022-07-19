@@ -48,15 +48,16 @@ stages:
               artifact_name: 'terraform-backend'
               working_path: ${{ variables.tf_script_path }}
 
-  - stage: Plan
+  - stage: dev
     jobs:
-      - job: dev
+      - job: plan
         displayName: Plan Dev Environment
         steps:
         - template: ../templates/steps/azure-setup.yaml
           parameters:
+          tags: "{UseCase:Terraform, Stage:dev}""
             resource_group_name: ${{ variables.project_name }}-rg
-            storage_account_name: "storageaccount"
+            storage_account_name: "storageaccountdemo"
             resource_group_location: "westus"
             service_connection_name: ${{ variables.service_connection_name }}
 
