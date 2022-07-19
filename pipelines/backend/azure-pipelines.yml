@@ -28,8 +28,8 @@ variables:
   tf_script_path: "$(System.DefaultWorkingDirectory)/terraform/backend"
   #tf_modules_path: '$(System.DefaultWorkingDirectory)/terraform-modules'
 
-variables:
-  - group: "demo-containers-group"
+# variables:
+#   - group: "demo-containers-group"
 
 pool:
   vmImage: ubuntu-latest
