@@ -22,7 +22,7 @@ parameters:
 
 variables:
   build_counter: $[counter('build-counter-$(RELEASE_NAME)', 1)]
-  app_name: "demo-containers"
+  project_name: "demo-containers"
   service_connection_name: "SC-AzureDevOps" 
   tfstate_storage_account_resource_group_name: "demo-containers-dev"
   tfstate_storage_account_name: "stacdev"
