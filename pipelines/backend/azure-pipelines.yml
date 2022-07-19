@@ -55,9 +55,9 @@ stages:
         steps:
         - template: ../templates/steps/azure-setup.yaml
           parameters:
-            tags: "{UseCase:Terraform, Stage:dev}"
+            tags: '{"UseCase":"Terraform", "Stage":"dev"}'
             resource_group_name: ${{ variables.project_name }}-rg
-            storage_account_name: "storageaccountdemo"
+            storage_account_name: "storageaccountdemo1234"
             resource_group_location: "westus"
             service_connection_name: ${{ variables.service_connection_name }}
 
