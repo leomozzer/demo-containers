@@ -48,7 +48,7 @@ steps:
     inputs:
       targetType: 'inline'
       script: |
-        terraform plan -out=${{ parameters.out_file }}.plan -var-file="${{ parameters.stage }}.tfvars -input=false -lock-timeout=10m"
+        terraform plan -out=${{ parameters.out_file }}.plan -var-file="${{ parameters.stage }}.tfvars" -input=false -lock-timeout=10m
       workingDirectory: '${{ parameters.working_path }}'
 
   # - task: TerraformTaskV2@2
