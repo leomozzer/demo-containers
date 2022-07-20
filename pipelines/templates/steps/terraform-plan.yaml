@@ -29,8 +29,8 @@ steps:
       script: touch ${{ parameters.working_path }}/${{ parameters.stage }}.tfvars
 
   # Workaround for https://github.com/microsoft/azure-pipelines-extensions/issues/664
-  - powershell: New-Item -Path "${{ parameters.working_path }}" -Name "backend.tf" -Value "terraform {`r`nbackend `"azurerm`" {}`r`n}"
-    displayName: "Create backend.tf"
+  # - powershell: New-Item -Path "${{ parameters.working_path }}" -Name "backend.tf" -Value "terraform {`r`nbackend `"azurerm`" {}`r`n}"
+  #   displayName: "Create backend.tf"
 
   - powershell: New-Item -Path "${{ parameters.working_path }}" -Name "azurerm_provider.tf" -Value "provider `"azurerm`"{`r`nskip_provider_registration = true`r`nfeatures {}`r`n}"
     displayName: "Create azurerm_provider.tf"
