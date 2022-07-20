@@ -57,19 +57,19 @@ stages:
           parameters:
             tags: '"UseCase=Terraform" "Stage=dev"'
             resource_group_name: ${{ variables.project_name }}-rg
-            storage_account_name: "storageaccountdemo1234"
+            storage_account_name: "storageaccountdemo123456"
             resource_group_location: "westus"
             service_connection_name: ${{ variables.service_connection_name }}
 
-        # - template: ../templates/steps/terraform-plan.yaml
-        #   parameters: 
-        #     stage: dev
-        #     tfstate_storage_account_resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
-        #     service_connection_name: ${{ variables.service_connection_name }}
-        #     tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
-        #     tf_version: ${{ variables.tf_version }}
-        #     project_name: ${{ variables.project_name }}
-        #     working_path: ${{ variables.tf_script_path }}
+        - template: ../templates/steps/terraform-plan.yaml
+          parameters: 
+            stage: dev
+            tfstate_storage_account_resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
+            service_connection_name: ${{ variables.service_connection_name }}
+            tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
+            tf_version: ${{ variables.tf_version }}
+            project_name: ${{ variables.project_name }}
+            working_path: ${{ variables.tf_script_path }}
 
     # - job: 'ACR_Setup'
     #   steps:
