@@ -43,13 +43,13 @@ steps:
         terraform init
       workingDirectory: '${{ parameters.work_dir }}'
 
-  # - task: Bash@3
-  #   displayName: 'Terraform plan'
-  #   inputs:
-  #     targetType: 'inline'
-  #     script: |
-  #       terraform plan -out=${{ parameters.out_file }}.plan -input=false ${{ parameters.input_vars }}
-  #     workingDirectory: '${{ parameters.work_dir }}'
+  - task: Bash@3
+    displayName: 'Terraform plan'
+    inputs:
+      targetType: 'inline'
+      script: |
+        terraform plan -out=${{ parameters.out_file }}.plan -var-file="${{ parameters.stage }}.tfvars"
+      workingDirectory: '${{ parameters.work_dir }}'
 
   # - task: TerraformTaskV2@2
   #   displayName: "Terraform Init ${{ parameters.stage }}"
@@ -72,13 +72,13 @@ steps:
   #     environmentServiceNameAzureRM: ${{ parameters.service_connection_name }}
   #     workingDirectory: $(System.DefaultWorkingDirectory)/terraform-live
       
-  # - task: ArchiveFiles@2
-  #   displayName: Archive terraform-live and plan-files
-  #   inputs:
-  #     includeRootFolder: false
-  #     rootFolderOrFile: $(System.DefaultWorkingDirectory)/terraform-live
-  #     archiveType: tar
-  #     archiveFile: terraform-live-${{ parameters.stage }}.tar
+  - task: ArchiveFiles@2
+    displayName: Archive terraform-live and plan-files
+    inputs:
+      includeRootFolder: false
+      rootFolderOrFile: ${{ parameters.working_path }}
+      archiveType: tar
+      archiveFile: terraform-live-${{ parameters.stage }}.tar
 
   # - task: ArchiveFiles@2
   #   displayName: Archive terraform-modules
@@ -88,18 +88,18 @@ steps:
   #     archiveType: tar
   #     archiveFile: terraform-modules-${{ parameters.stage }}.tar
 
-  # - task: AzureCLI@2
-  #   displayName: Copy ${{ parameters.stage }} plan of TF-Live to Storage
-  #   inputs:
-  #     azureSubscription: ${{ parameters.service_connection_name }}
-  #     scriptType: bash
-  #     scriptLocation: inlineScript
-  #     inlineScript: |
-  #       az storage blob upload \
-  #         --container-name plans \
-  #         --file terraform-live-${{ parameters.stage }}.tar \
-  #         --name "$(Build.BuildNumber)-live-${{ parameters.stage }}.tar" \
-  #         --account-name "${{ parameters.tfstate_storage_account_name }}"
+  - task: AzureCLI@2
+    displayName: Copy ${{ parameters.stage }} plan of TF-Live to Storage
+    inputs:
+      azureSubscription: ${{ parameters.service_connection_name }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        az storage blob upload \
+          --container-name plans \
+          --file terraform-live-${{ parameters.stage }}.tar \
+          --name "$(Build.BuildNumber)-live-${{ parameters.stage }}.tar" \
+          --account-name "${{ parameters.tfstate_storage_account_name }}"
 
   # - task: AzureCLI@2
   #   displayName: Copy ${{ parameters.stage }} plan of TF-Modules to Storage
