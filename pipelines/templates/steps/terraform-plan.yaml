@@ -41,7 +41,7 @@ steps:
       targetType: 'inline'
       script: |
         terraform init
-      workingDirectory: '${{ parameters.work_dir }}'
+      workingDirectory: '${{ parameters.working_path }}'
 
   - task: Bash@3
     displayName: 'Terraform plan'
@@ -49,7 +49,7 @@ steps:
       targetType: 'inline'
       script: |
         terraform plan -out=${{ parameters.out_file }}.plan -var-file="${{ parameters.stage }}.tfvars"
-      workingDirectory: '${{ parameters.work_dir }}'
+      workingDirectory: '${{ parameters.working_path }}'
 
   # - task: TerraformTaskV2@2
   #   displayName: "Terraform Init ${{ parameters.stage }}"
