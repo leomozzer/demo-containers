@@ -10,16 +10,6 @@ parameters:
 
 
 steps:
-  - task: AzureCLI@2
-    displayName: 'Create storage account for Terraform'
-    inputs:
-      azureSubscription: ${{ parameters.service_connection_name }}
-      scriptType: 'bash'
-      scriptLocation: inlineScript  
-      inlineScript: |
-        az storage account create --resource-group ${{ parameters.tfstate_storage_account_resource_group_name }} --name ${{ parameters.tfstate_storage_account_name }} --sku Standard_LRS --kind StorageV2 --encryption-services blob --access-tier Cool --allow-blob-public-access false
-        az storage container create --name states --account-name ${{ parameters.tfstate_storage_account_name }}
-        az storage container create --name plans --account-name ${{ parameters.tfstate_storage_account_name }}
 
   - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
     displayName: "Install Terraform ${{ parameters.tf_version }}"
@@ -31,3 +21,95 @@ steps:
     inputs:
       targetType: "inline"
       script: terraform fmt -check -recursive -diff ${{ parameters.working_path}}
+
+  - task: Bash@3
+    displayName: "Ensure ${{ parameters.stage }}.tfvars"
+    inputs:
+      targetType: "inline"
+      script: touch $(System.DefaultWorkingDirectory)/terraform-live/${{ parameters.stage }}.tfvars
+
+  # Workaround for https://github.com/microsoft/azure-pipelines-extensions/issues/664
+  - powershell: New-Item -Path "$(System.DefaultWorkingDirectory)/terraform-live" -Name "backend.tf" -Value "terraform {`r`nbackend `"azurerm`" {}`r`n}"
+    displayName: "Create backend.tf"
+
+  - powershell: New-Item -Path "$(System.DefaultWorkingDirectory)/terraform-live" -Name "azurerm_provider.tf" -Value "provider `"azurerm`"{`r`nskip_provider_registration = true`r`nfeatures {}`r`n}"
+    displayName: "Create azurerm_provider.tf"
+
+  - task: Bash@3
+    displayName: 'Terraform init'
+    inputs:
+      targetType: 'inline'
+      script: |
+        terraform init
+      workingDirectory: '${{ parameters.work_dir }}'
+
+  # - task: Bash@3
+  #   displayName: 'Terraform plan'
+  #   inputs:
+  #     targetType: 'inline'
+  #     script: |
+  #       terraform plan -out=${{ parameters.out_file }}.plan -input=false ${{ parameters.input_vars }}
+  #     workingDirectory: '${{ parameters.work_dir }}'
+
+  # - task: TerraformTaskV2@2
+  #   displayName: "Terraform Init ${{ parameters.stage }}"
+  #   inputs:
+  #     provider: "azurerm"
+  #     command: "init"
+  #     workingDirectory: $(System.DefaultWorkingDirectory)/terraform-live
+  #     backendServiceArm: ${{ parameters.service_connection_name }}
+  #     backendAzureRmResourceGroupName: ${{ parameters.tfstate_storage_account_resource_group_name }}
+  #     backendAzureRmStorageAccountName: ${{ parameters.tfstate_storage_account_name }}
+  #     backendAzureRmContainerName: states
+  #     backendAzureRmKey: "${{ parameters.project_name }}.tfstate"
+  #     commandOptions: "-reconfigure"
+
+  # - task: TerraformTaskV2@2
+  #   displayName: 'Terraform Plan ${{ parameters.stage }}'
+  #   inputs:
+  #     command: plan
+  #     commandOptions: '-var-file="${{ parameters.stage }}.tfvars" -lock-timeout=10m -out=${{ parameters.stage }}.plan'
+  #     environmentServiceNameAzureRM: ${{ parameters.service_connection_name }}
+  #     workingDirectory: $(System.DefaultWorkingDirectory)/terraform-live
+      
+  # - task: ArchiveFiles@2
+  #   displayName: Archive terraform-live and plan-files
+  #   inputs:
+  #     includeRootFolder: false
+  #     rootFolderOrFile: $(System.DefaultWorkingDirectory)/terraform-live
+  #     archiveType: tar
+  #     archiveFile: terraform-live-${{ parameters.stage }}.tar
+
+  # - task: ArchiveFiles@2
+  #   displayName: Archive terraform-modules
+  #   inputs:
+  #     includeRootFolder: false
+  #     rootFolderOrFile: $(System.DefaultWorkingDirectory)/terraform-modules
+  #     archiveType: tar
+  #     archiveFile: terraform-modules-${{ parameters.stage }}.tar
+
+  # - task: AzureCLI@2
+  #   displayName: Copy ${{ parameters.stage }} plan of TF-Live to Storage
+  #   inputs:
+  #     azureSubscription: ${{ parameters.service_connection_name }}
+  #     scriptType: bash
+  #     scriptLocation: inlineScript
+  #     inlineScript: |
+  #       az storage blob upload \
+  #         --container-name plans \
+  #         --file terraform-live-${{ parameters.stage }}.tar \
+  #         --name "$(Build.BuildNumber)-live-${{ parameters.stage }}.tar" \
+  #         --account-name "${{ parameters.tfstate_storage_account_name }}"
+
+  # - task: AzureCLI@2
+  #   displayName: Copy ${{ parameters.stage }} plan of TF-Modules to Storage
+  #   inputs:
+  #     azureSubscription: ${{ parameters.service_connection_name }}
+  #     scriptType: bash
+  #     scriptLocation: inlineScript
+  #     inlineScript: |
+  #       az storage blob upload \
+  #         --container-name plans \
+  #         --file terraform-modules-${{ parameters.stage }}.tar \
+  #         --name "$(Build.BuildNumber)-modules-${{ parameters.stage }}.tar" \
+  #         --account-name "${{ parameters.tfstate_storage_account_name }}"
