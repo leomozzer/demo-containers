@@ -26,7 +26,7 @@ steps:
     displayName: "Ensure ${{ parameters.stage }}.tfvars"
     inputs:
       targetType: "inline"
-      script: touch $(System.DefaultWorkingDirectory)/terraform-live/${{ parameters.stage }}.tfvars
+      script: touch ${{ parameters.working_path }}/${{ parameters.stage }}.tfvars
 
   # Workaround for https://github.com/microsoft/azure-pipelines-extensions/issues/664
   - powershell: New-Item -Path "$(System.DefaultWorkingDirectory)/terraform-live" -Name "backend.tf" -Value "terraform {`r`nbackend `"azurerm`" {}`r`n}"
