@@ -58,7 +58,7 @@ stages:
           parameters:
             tags: '"UseCase=Terraform" "Stage=dev"'
             resource_group_name: ${{ variables.project_name }}-rg
-            storage_account_name: "storageaccountdemo123456"
+            storage_account_name: ${{ variables.tfstate_storage_account_name }}
             resource_group_location: "westus"
             service_connection_name: ${{ variables.service_connection_name }}
 

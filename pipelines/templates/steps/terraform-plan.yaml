@@ -35,13 +35,13 @@ steps:
   - powershell: New-Item -Path "${{ parameters.working_path }}" -Name "azurerm_provider.tf" -Value "provider `"azurerm`"{`r`nskip_provider_registration = true`r`nfeatures {}`r`n}"
     displayName: "Create azurerm_provider.tf"
 
-  - task: Bash@3
-    displayName: 'Terraform init'
-    inputs:
-      targetType: 'inline'
-      script: |
-        terraform init
-      workingDirectory: '${{ parameters.working_path }}'
+  # - task: Bash@3
+  #   displayName: 'Terraform init'
+  #   inputs:
+  #     targetType: 'inline'
+  #     script: |
+  #       terraform init
+  #     workingDirectory: '${{ parameters.working_path }}'
 
   ### Add new AZ task
   #https://levelup.gitconnected.com/using-terraform-with-azure-azure-pipelines-github-actions-86e043bd0d9e
