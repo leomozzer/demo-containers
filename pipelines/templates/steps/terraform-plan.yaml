@@ -43,13 +43,26 @@ steps:
         terraform init
       workingDirectory: '${{ parameters.working_path }}'
 
-  - task: Bash@3
-    displayName: 'Terraform plan'
+  ### Add new AZ task
+  #https://levelup.gitconnected.com/using-terraform-with-azure-azure-pipelines-github-actions-86e043bd0d9e
+
+  # - task: Bash@3
+  #   displayName: 'Terraform plan'
+  #   inputs:
+  #     targetType: 'inline'
+  #     script: |
+  #       terraform plan -out=${{ parameters.out_file }}.plan -var-file="${{ parameters.stage }}.tfvars" -input=false -lock-timeout=10m
+  #     workingDirectory: '${{ parameters.working_path }}'
+
+  - task: AzureCLI@2
+    displayName: 'Terraform Plan'
     inputs:
-      targetType: 'inline'
-      script: |
+      azureSubscription: ${{ parameters.service_connection_name }}
+      scriptType: 'bash'
+      scriptLocation: inlineScript  
+      workingDirectory: ${{ parameters.working_path }}
+      inlineScript: |
         terraform plan -out=${{ parameters.out_file }}.plan -var-file="${{ parameters.stage }}.tfvars" -input=false -lock-timeout=10m
-      workingDirectory: '${{ parameters.working_path }}'
 
   # - task: TerraformTaskV2@2
   #   displayName: "Terraform Init ${{ parameters.stage }}"
