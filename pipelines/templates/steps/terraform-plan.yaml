@@ -58,7 +58,7 @@ steps:
     displayName: 'Terraform Plan'
     inputs:
       azureSubscription: ${{ parameters.service_connection_name }}
-      scriptType: pscore
+      scriptType: 'bash'
       scriptLocation: inlineScript  
       workingDirectory: ${{ parameters.working_path }}
       inlineScript: |
