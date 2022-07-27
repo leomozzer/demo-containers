@@ -53,3 +53,9 @@ module "keyvault" {
   ]
   storage_permissions = ["Get", "List", "Update", "Purge"]
 }
+
+module "keyvault_secret" {
+  source = "../terraform-modules/keyvault-secret"
+  name   = random_string.random.result
+  value  = random_string.random.result
+}
