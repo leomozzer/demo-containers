@@ -56,8 +56,8 @@ module "keyvault" {
 
 module "keyvault_secret" {
   source       = "../terraform-modules/keyvault-secret"
-  for_each     = toset(["assets", "media"])
-  name         = each.key
-  value        = each.key
+  for_each     = { for secret in [module.acr.admin_username, module.acr.admin_password] : secret.key => secret }
+  name         = each.value.key
+  value        = each.value.output
   key_vault_id = module.keyvault.key_vault_id
 }
