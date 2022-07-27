@@ -32,10 +32,6 @@ variable "sku_name" {
   default = "standard"
 }
 
-variable "access_policy" {
-  type = map(any)
-}
-
 variable "object_id" {
   type = string
 }
