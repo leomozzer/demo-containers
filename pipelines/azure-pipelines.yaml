@@ -41,7 +41,7 @@ stages:
       - job: plan
         displayName: Plan Dev Environment
         steps:
-        - template: ../templates/steps/azure-setup.yaml
+        - template: ./templates/steps/azure-setup.yaml
           parameters:
             tags: '"UseCase=Terraform" "Stage=dev"'
             resource_group_name: ${{ variables.project_name }}-rg
@@ -49,7 +49,7 @@ stages:
             resource_group_location: "westus"
             service_connection_name: ${{ variables.service_connection_name }}
 
-        - template: ../templates/steps/terraform-plan.yaml
+        - template: ./templates/steps/terraform-plan.yaml
           parameters: 
             stage: dev
             tfstate_storage_account_resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
