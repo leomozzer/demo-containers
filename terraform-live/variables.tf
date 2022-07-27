@@ -8,3 +8,9 @@ variable "app_name" {
   description = "App name"
   type        = string
 }
+
+variable "rg_location" {
+  description = "Location where the resource group will be created"
+  type        = string
+  default     = "West Europe"
+}
