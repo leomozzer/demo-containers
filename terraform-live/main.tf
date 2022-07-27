@@ -6,12 +6,12 @@ resource "random_string" "random" {
 }
 
 locals {
-  project_name  = "${var.app_name}-${random_string.random.result}"
+  #project_name  = "${var.app_name}-${random_string.random.result}"
   random_result = random_string.random.result
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = "${local.random_result}-${local.project_name}-${var.stage}-rg"
+  name     = "${local.random_result}-${var.app_name}-${var.stage}-rg"
   location = var.rg_location
 }
 
@@ -55,7 +55,9 @@ module "keyvault" {
 }
 
 module "keyvault_secret" {
-  source = "../terraform-modules/keyvault-secret"
-  name   = random_string.random.result
-  value  = random_string.random.result
+  source       = "../terraform-modules/keyvault-secret"
+  for_each     = toset(["assets", "media"])
+  name         = each.key
+  value        = each.key
+  key_vault_id = module.keyvault.key_vault_id
 }
