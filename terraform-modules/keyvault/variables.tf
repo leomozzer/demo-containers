@@ -36,3 +36,25 @@ variable "sku_name" {
 variable "object_id" {
   type = string
 }
+
+variable "key_permissions" {
+  type = list(string)
+}
+
+variable "secret_permissions" {
+  type = list(string)
+}
+
+variable "storage_permissions" {
+  type = list(string)
+}
+
+variable "network_acls_bypass" {
+  type    = string
+  default = "AzureServices"
+}
+
+variable "network_acls_default_action" {
+  type    = string
+  default = "Deny"
+}

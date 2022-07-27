@@ -15,29 +15,15 @@ resource "azurerm_key_vault" "keyvault" {
     #object_id = data.azurerm_client_config.current.object_id
     object_id = var.object_id
 
-    key_permissions = [
-      "Create",
-      "Get",
-      "Purge",
-      "Recover",
-      "Restore",
-      "Update"
-    ]
+    key_permissions = var.key_permissions
 
-    secret_permissions = [
-      "Set",
-      "Get",
-      "List",
-      "Delete",
-      "Purge",
-      "Recover"
-    ]
+    secret_permissions = var.secret_permissions
 
-    storage_permissions = ["Get", "List", "Update", "Purge"]
+    storage_permissions = var.storage_permissions
   }
 
   network_acls {
-    bypass         = "AzureServices"
-    default_action = "Deny"
+    bypass         = var.network_acls_bypass
+    default_action = var.network_acls_default_action
   }
 }
