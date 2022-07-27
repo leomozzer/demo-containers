@@ -20,7 +20,8 @@ variable "tenant_id" {
 }
 
 variable "soft_delete_retention_days" {
-  type = number
+  type    = number
+  default = 7
 }
 
 variable "purge_protection_enabled" {
