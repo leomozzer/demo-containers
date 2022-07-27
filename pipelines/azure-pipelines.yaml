@@ -1,0 +1,60 @@
+name: Build $(build_counter)
+
+trigger:
+  batch: true
+  branches:
+    include:
+    - main
+  paths:
+    include:
+    - terraform-live
+    - pipelines/azure-pipelines.yaml
+    - pipelines/templates
+
+variables:
+  build_counter: $[counter('build-counter-$(RELEASE_NAME)', 1)]
+  project_name: "demo-containers"
+  service_connection_name: "SC-AzureDevOps" 
+  tfstate_storage_account_resource_group_name: "demo-containers-dev"
+  tfstate_storage_account_name: "stacdev"
+  tf_version: 1.1.7
+  tf_script_path: "$(System.DefaultWorkingDirectory)/terraform-live"
+  #tf_modules_path: '$(System.DefaultWorkingDirectory)/terraform-modules'
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: QualityCheckStage
+    displayName: Quality Check Stage
+    jobs:
+      - job: TFSecJobMain
+        displayName: TFSec Scan terraform-live
+        steps:
+          - template: ../templates/steps/tfsec.yaml
+            parameters:
+              artifact_name: 'terraform-live'
+              working_path: ${{ variables.tf_script_path }}
+
+  - stage: dev
+    jobs:
+      - job: plan
+        displayName: Plan Dev Environment
+        steps:
+        - template: ../templates/steps/azure-setup.yaml
+          parameters:
+            tags: '"UseCase=Terraform" "Stage=dev"'
+            resource_group_name: ${{ variables.project_name }}-rg
+            storage_account_name: ${{ variables.tfstate_storage_account_name }}
+            resource_group_location: "westus"
+            service_connection_name: ${{ variables.service_connection_name }}
+
+        - template: ../templates/steps/terraform-plan.yaml
+          parameters: 
+            stage: dev
+            tfstate_storage_account_resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
+            service_connection_name: ${{ variables.service_connection_name }}
+            tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
+            tf_version: ${{ variables.tf_version }}
+            project_name: ${{ variables.project_name }}
+            working_path: ${{ variables.tf_script_path }}
