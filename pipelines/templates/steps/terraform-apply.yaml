@@ -29,20 +29,20 @@ steps:
           --container-name plans
         tar -xvf terraform-live.tar -C terraform-live
 
-  - task: AzureCLI@2
-    displayName: Copy ${{ parameters.stage }} terraform-modules folder from Storage
-    inputs:
-      azureSubscription: ${{ parameters.service_connection_name }}
-      scriptType: bash
-      scriptLocation: inlineScript
-      inlineScript: |
-        mkdir terraform-modules
-        az storage blob download \
-          --file terraform-modules.tar \
-          --name "$(Build.BuildNumber)-modules-${{ parameters.stage }}.tar" \
-          --account-name "${{ parameters.tfstate_storage_account_name }}" \
-          --container-name plans
-        tar -xvf terraform-modules.tar -C terraform-modules
+  # - task: AzureCLI@2
+  #   displayName: Copy ${{ parameters.stage }} terraform-modules folder from Storage
+  #   inputs:
+  #     azureSubscription: ${{ parameters.service_connection_name }}
+  #     scriptType: bash
+  #     scriptLocation: inlineScript
+  #     inlineScript: |
+  #       mkdir terraform-modules
+  #       az storage blob download \
+  #         --file terraform-modules.tar \
+  #         --name "$(Build.BuildNumber)-modules-${{ parameters.stage }}.tar" \
+  #         --account-name "${{ parameters.tfstate_storage_account_name }}" \
+  #         --container-name plans
+  #       tar -xvf terraform-modules.tar -C terraform-modules
 
   - task: TerraformTaskV2@2
     displayName: 'Terraform Apply ${{ parameters.stage }}'
