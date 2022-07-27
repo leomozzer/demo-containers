@@ -33,6 +33,6 @@ module "keyvault" {
   tenant_id                   = data.azurerm_client_config.current.tenant_id
   soft_delete_retention_days  = 1
   purge_protection_enabled    = true
-  sku_name                    = standard
+  sku_name                    = "standard"
   object_id                   = data.azurerm_client_config.current.object_id
 }
