@@ -58,3 +58,16 @@ stages:
             tf_version: ${{ variables.tf_version }}
             project_name: ${{ variables.project_name }}
             working_path: ${{ variables.tf_script_path }}
+
+      - job: apply
+        displayName: Terraform Apply
+        steps:
+          - template: ./templates/steps/terraform-apply.yaml
+            parameters:
+              stage: dev
+              tfstate_storage_account_resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
+              service_connection_name: ${{ variables.service_connection_name }}
+              tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
+              tf_version: ${{ variables.tf_version }}
+              project_name: ${{ variables.project_name }}
+              working_path: ${{ variables.tf_script_path }}

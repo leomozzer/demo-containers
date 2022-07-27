@@ -1,0 +1,53 @@
+# Leave parameters empty. Will be filled by terraform-pipeline.yaml
+parameters:
+  stage: ""
+  tfstate_storage_account_resource_group_name: ""
+  tfstate_storage_account_name: ""
+  tf_version: ""
+  service_connection_name: ""
+  project_name: ""
+  working_path: ""
+
+steps:
+  - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+    displayName: "Install Terraform ${{ parameters.tf_version }}"
+    inputs:
+      terraformVersion: ${{ parameters.tf_version }}
+
+  - task: AzureCLI@2
+    displayName: Copy ${{ parameters.stage }} terraform-live folder from Storage
+    inputs:
+      azureSubscription: ${{ parameters.service_connection_name }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        mkdir terraform-live
+        az storage blob download \
+          --file terraform-live.tar \
+          --name "$(Build.BuildNumber)-live-${{ parameters.stage }}.tar" \
+          --account-name "${{ parameters.tfstate_storage_account_name }}" \
+          --container-name plans
+        tar -xvf terraform-live.tar -C terraform-live
+
+  - task: AzureCLI@2
+    displayName: Copy ${{ parameters.stage }} terraform-modules folder from Storage
+    inputs:
+      azureSubscription: ${{ parameters.service_connection_name }}
+      scriptType: bash
+      scriptLocation: inlineScript
+      inlineScript: |
+        mkdir terraform-modules
+        az storage blob download \
+          --file terraform-modules.tar \
+          --name "$(Build.BuildNumber)-modules-${{ parameters.stage }}.tar" \
+          --account-name "${{ parameters.tfstate_storage_account_name }}" \
+          --container-name plans
+        tar -xvf terraform-modules.tar -C terraform-modules
+
+  - task: TerraformTaskV2@2
+    displayName: 'Terraform Apply ${{ parameters.stage }}'
+    inputs:
+      command: apply
+      commandOptions: "-lock-timeout=10m ${{ parameters.stage }}.plan"
+      environmentServiceNameAzureRM: ${{ parameters.service_connection_name }}
+      workingDirectory: ${{ parameters.working_path }}

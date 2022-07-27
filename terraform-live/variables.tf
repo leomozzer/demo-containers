@@ -14,3 +14,9 @@ variable "rg_location" {
   type        = string
   default     = "West Europe"
 }
+
+variable "acr_sku" {
+  description = "SKU of the Azure Container Registry"
+  type        = string
+  default     = "Basic"
+}
