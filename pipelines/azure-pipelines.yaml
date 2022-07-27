@@ -60,7 +60,8 @@ stages:
             working_path: ${{ variables.tf_script_path }}
 
       - job: apply
-        condition: and(succeeded('plan'), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+        dependsOn: plan
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
         displayName: Terraform Apply
         steps:
           - template: ./templates/steps/terraform-apply.yaml
