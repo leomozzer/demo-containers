@@ -31,7 +31,7 @@ stages:
       - job: TFSecJobMain
         displayName: TFSec Scan terraform-live
         steps:
-          - template: ../templates/steps/tfsec.yaml
+          - template: ./templates/steps/tfsec.yaml
             parameters:
               artifact_name: 'terraform-live'
               working_path: ${{ variables.tf_script_path }}
