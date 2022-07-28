@@ -59,5 +59,5 @@ module "keyvault_secret" {
   for_each     = { for secret in [module.acr.admin_username, module.acr.admin_password] : secret.key => secret }
   name         = each.value.key
   value        = each.value.output
-  key_vault_id = module.keyvault.key_vault_id
+  key_vault_id = module.keyvault.key_vault_id.output
 }
