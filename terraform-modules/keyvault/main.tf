@@ -22,8 +22,8 @@ resource "azurerm_key_vault" "keyvault" {
     storage_permissions = var.storage_permissions
   }
 
-  network_acls {
-    bypass         = var.network_acls_bypass
-    default_action = var.network_acls_default_action
-  }
+  # network_acls {
+  #   bypass         = var.network_acls_bypass
+  #   default_action = var.network_acls_default_action
+  # }
 }
