@@ -37,7 +37,7 @@ module "keyvault" {
   object_id                   = data.azurerm_client_config.current.object_id
   key_permissions             = []
   secret_permissions          = ["get", "list", "delete", "recover", "backup", "restore", "set"]
-  certificate_permissions     = []
+  storage_permissions         = []
 }
 
 module "keyvault_secret" {
