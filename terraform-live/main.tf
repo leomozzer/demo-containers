@@ -36,16 +36,16 @@ module "keyvault" {
   sku_name                    = "standard"
   object_id                   = data.azurerm_client_config.current.object_id
   key_permissions = [
-    "get", "list", "update", "create", "import", "delete", "recover", "backup", "restore",
+    "Create", "Get",
   ]
 
   secret_permissions = [
-    "get", "list", "delete", "recover", "backup", "restore", "set",
+    "Backup", "Delete", "Get", "List", "Purge", "Recover", "Restore", "Set"
   ]
 
-  certificate_permissions = [
-    "get", "list", "update", "create", "import", "delete", "recover", "backup", "restore", "deleteissuers", "getissuers", "listissuers", "managecontacts", "manageissuers", "setissuers",
-  ]
+  # certificate_permissions = [
+  #   "get", "list", "update", "create", "import", "delete", "recover", "backup", "restore", "deleteissuers", "getissuers", "listissuers", "managecontacts", "manageissuers", "setissuers",
+  # ]
 }
 
 module "keyvault_secret" {
