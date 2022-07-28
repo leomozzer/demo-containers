@@ -45,7 +45,7 @@ variable "secret_permissions" {
   type = list(string)
 }
 
-variable "storage_permissions" {
+variable "certificate_permissions" {
   type = list(string)
 }
 

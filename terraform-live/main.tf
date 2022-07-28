@@ -35,9 +35,17 @@ module "keyvault" {
   purge_protection_enabled    = true
   sku_name                    = "standard"
   object_id                   = data.azurerm_client_config.current.object_id
-  key_permissions             = []
-  secret_permissions          = ["get", "list", "delete", "recover", "backup", "restore", "set"]
-  storage_permissions         = []
+  key_permissions = [
+    "get", "list", "update", "create", "import", "delete", "recover", "backup", "restore",
+  ]
+
+  secret_permissions = [
+    "get", "list", "delete", "recover", "backup", "restore", "set",
+  ]
+
+  certificate_permissions = [
+    "get", "list", "update", "create", "import", "delete", "recover", "backup", "restore", "deleteissuers", "getissuers", "listissuers", "managecontacts", "manageissuers", "setissuers",
+  ]
 }
 
 module "keyvault_secret" {
