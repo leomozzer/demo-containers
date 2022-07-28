@@ -19,7 +19,7 @@ resource "azurerm_key_vault" "keyvault" {
 
     secret_permissions = var.secret_permissions
 
-    certificate_permissions = var.certificate_permissions
+    //certificate_permissions = var.certificate_permissions
   }
 
   # network_acls {
