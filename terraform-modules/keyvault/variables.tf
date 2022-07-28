@@ -45,10 +45,6 @@ variable "secret_permissions" {
   type = list(string)
 }
 
-# variable "certificate_permissions" {
-#   type = list(string)
-# }
-
 variable "network_acls_bypass" {
   type    = string
   default = "AzureServices"

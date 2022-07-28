@@ -17,7 +17,7 @@ variables:
   service_connection_name: "SC-AzureDevOps" 
   tfstate_storage_account_resource_group_name: "demo-containers-dev"
   tfstate_storage_account_name: "stacdev"
-  tf_version: 1.1.7
+  tf_version: 1.2.6
   tf_script_path: "$(System.DefaultWorkingDirectory)/terraform-live"
   #tf_modules_path: '$(System.DefaultWorkingDirectory)/terraform-modules'
 
