@@ -15,7 +15,7 @@ variables:
   build_counter: $[counter('build-counter-$(RELEASE_NAME)', 1)]
   project_name: "demo-containers"
   service_connection_name: "SC-AzureDevOps" 
-  tfstate_storage_account_resource_group_name: "demo-containers-dev"
+  tfstate_storage_account_resource_group_name: "demo-containers-rg"
   tfstate_storage_account_name: "stacdev"
   tf_version: 1.2.6
   tf_script_path: "$(System.DefaultWorkingDirectory)/terraform-live"
@@ -44,7 +44,7 @@ stages:
         - template: ./templates/steps/azure-setup.yaml
           parameters:
             tags: '"UseCase=Terraform" "Stage=dev"'
-            resource_group_name: ${{ variables.project_name }}-rg
+            resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
             storage_account_name: ${{ variables.tfstate_storage_account_name }}
             resource_group_location: "westus"
             service_connection_name: ${{ variables.service_connection_name }}
