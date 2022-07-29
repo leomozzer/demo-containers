@@ -52,3 +52,5 @@ module "keyvault_secret" {
   value        = each.value.output
   key_vault_id = module.keyvault.key_vault_id.output
 }
+
+#https://truestorydavestorey.medium.com/how-to-get-an-azure-container-instance-running-inside-a-vnet-with-a-fileshare-mount-using-terraform-a12f5b2b86ce
