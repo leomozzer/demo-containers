@@ -3,12 +3,12 @@ variable "acg_name" {
   type        = string
 }
 
-variable "rg_location" {
+variable "location" {
   description = "Resource group location"
   type        = string
 }
 
-variable "rg_name" {
+variable "resource_group_name" {
   description = "Resource group name"
 }
 
@@ -24,15 +24,15 @@ variable "os_type" {
   default     = "Linux"
 }
 
-variable "container_name" {
-  description = "Container name"
-  type        = string
-}
+# variable "container_name" {
+#   description = "Container name"
+#   type        = string
+# }
 
-variable "container_image" {
-  description = "Container image"
-  type        = string
-}
+# variable "container_image" {
+#   description = "Container image"
+#   type        = string
+# }
 
 variable "acr_username" {
   description = "ACR username"
@@ -59,5 +59,5 @@ variable "acr_server" {
 # }
 
 variable "container_list" {
-  type = list(map(any))
+  type = any
 }
