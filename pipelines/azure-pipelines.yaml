@@ -29,12 +29,12 @@ stages:
     displayName: Quality Check Stage
     jobs:
       - job: TFSecJobMain
-        displayName: TFSec Scan terraform-live
+        displayName: TFSec Scan terraform-acr
         steps:
           - template: ./templates/steps/tfsec.yaml
             parameters:
-              artifact_name: 'terraform-live'
-              working_path: ${{ variables.tf_script_path }}
+              artifact_name: 'terraform-acr'
+              working_path: '${{ variables.tf_script_path }}/terraform-acr'
 
   - stage: dev
     jobs:
@@ -57,12 +57,12 @@ stages:
             tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
             tf_version: ${{ variables.tf_version }}
             project_name: ${{ variables.project_name }}
-            working_path: ${{ variables.tf_script_path }}
+            working_path: '${{ variables.tf_script_path }}/terraform-acr'
 
       - job: apply
         dependsOn: plan
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-        displayName: Terraform Apply
+        displayName: Terraform Apply ACR
         steps:
           - template: ./templates/steps/terraform-apply.yaml
             parameters:
@@ -72,4 +72,21 @@ stages:
               tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
               tf_version: ${{ variables.tf_version }}
               project_name: ${{ variables.project_name }}
-              working_path: ${{ variables.tf_script_path }}
+              working_path: '${{ variables.tf_script_path }}/terraform-acr'
+
+          - task: Bash@3
+            displayName: 'Terraform Output'
+            inputs:
+              targetType: 'inline'
+              script: |
+                terraform output -json > ./output.json
+              workingDirectory: '${{ variables.tf_script_path }}/terraform-acr'
+          
+          - task: PowerShell@2
+            displayName: 'Resource Group name'
+            inputs:
+              targetType: 'inline'
+              script: |
+                $data = Get-content ${{ variables.tf_script_path }}/terraform-acr/output.json | out-string | ConvertFrom-Json
+                $resource_group_name = $data.resource_group_name.value
+                Write-Host "##vso[task.setvariable variable=resource_group_name;]$resource_group_name"
