@@ -120,6 +120,8 @@ stages:
 
       - job: planAcg
         displayName: Terraform Plan ACG
+        dependsOn: mysqlbuildpush
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
         steps:
         - template: ./templates/steps/terraform-plan.yaml
           parameters: 
