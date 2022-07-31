@@ -12,7 +12,7 @@ output "admin_password" {
   }
 }
 
-output "acr_name" {
+output "name" {
   value = {
     "key" : "admin-password"
     "output" : azurerm_container_registry.acr.name
