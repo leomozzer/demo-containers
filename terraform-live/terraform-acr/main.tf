@@ -46,7 +46,7 @@ module "keyvault" {
 }
 
 module "keyvault_secret" {
-  source       = "../terraform-modules/keyvault-secret"
+  source       = "../../terraform-modules/keyvault-secret"
   for_each     = { for secret in [module.acr.admin_username, module.acr.admin_password] : secret.key => secret }
   name         = each.value.key
   value        = each.value.output
