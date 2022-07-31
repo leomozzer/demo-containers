@@ -17,13 +17,13 @@ steps:
       projectName: ${{ parameters.project_name }}
       qualifyImageNames: ${{ parameters.qualify_image_names }}
             
-    - task: DockerCompose@0
-      displayName: Push services
-      inputs:
-        action: Push services
-        containerregistrytype: Azure Container Registry
-        azureSubscriptionEndpoint: ${{ parameters.service_connection_name }}
-        azureContainerRegistry: ${{ parameters.azure_container_registry }}
-        dockerComposeFile: ${{ parameters.docker_compose_file }}
-        projectName: ${{ parameters.project_name }}
-        qualifyImageNames: ${{ parameters.qualify_image_names }}
+  - task: DockerCompose@0
+    displayName: Push services
+    inputs:
+      action: Push services
+      containerregistrytype: Azure Container Registry
+      azureSubscriptionEndpoint: ${{ parameters.service_connection_name }}
+      azureContainerRegistry: ${{ parameters.azure_container_registry }}
+      dockerComposeFile: ${{ parameters.docker_compose_file }}
+      projectName: ${{ parameters.project_name }}
+      qualifyImageNames: ${{ parameters.qualify_image_names }}
