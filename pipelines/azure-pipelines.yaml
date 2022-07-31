@@ -97,10 +97,30 @@ stages:
           acr_name: $[ dependencies.apply.outputs['applyOutput.acr_name'] ] 
         displayName: Build and Push Mysql
         steps:
-        - template: ./templates/steps/docker.yaml
-          parameters:
-            service_connection_name: ${{ variables.service_connection_name }}
-            azure_container_registry: '$(acr_name).azurecr.io'
-            docker_compose_file: db/docker-compose.yml
-            project_name: mysql-$(System.StageName)
-            qualify_image_names: false
+        # - template: ./templates/steps/docker.yaml
+        #   parameters:
+        #     service_connection_name: ${{ variables.service_connection_name }}
+        #     azure_container_registry: '$(acr_name).azurecr.io'
+        #     docker_compose_file: db/docker-compose.yml
+        #     project_name: mysql-$(System.StageName)
+        #     qualify_image_names: false
+        - task: DockerCompose@0
+          displayName: Build services
+          inputs:
+            action: Build services
+            azureSubscriptionEndpoint: ${{ variables.service_connection_name }}
+            azureContainerRegistry: '$(acr_name).azurecr.io'
+            dockerComposeFile: db/docker-compose.yml
+            projectName: mysql-$(System.StageName)
+            qualifyImageNames: ${{ variables.qualify_image_names }}
+            
+        - task: DockerCompose@0
+          displayName: Push services
+          inputs:
+            action: Push services
+            containerregistrytype: Azure Container Registry
+            azureSubscriptionEndpoint: ${{ variables.service_connection_name }}
+            azureContainerRegistry: '$(acr_name).azurecr.io'
+            dockerComposeFile: db/docker-compose.yml
+            projectName: mysql-$(System.StageName)
+            qualifyImageNames: ${{ variables.qualify_image_names }}
