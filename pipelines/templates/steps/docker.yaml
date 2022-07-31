@@ -4,7 +4,7 @@ parameters:
   azure_container_registry: ""
   docker_compose_file: ""
   project_name: ""
-  qualify_image_names: false
+  qualify_image_names: ""
 
 steps:
   - task: DockerCompose@0
