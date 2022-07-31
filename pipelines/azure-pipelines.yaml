@@ -75,3 +75,16 @@ stages:
               tf_version: ${{ variables.tf_version }}
               project_name: ${{ variables.project_name }}
               working_path: '${{ variables.tf_script_path }}/terraform-acr'
+
+      - job: buildpush
+        displayName: Build and Push Mysql
+        steps:
+          - task: AzureCLI@2
+            displayName: 'Get ACR Name'
+            inputs:
+              azureSubscription: ${{ variables.service_connection_name }}
+              scriptType: 'bash'
+              scriptLocation: inlineScript  
+              inlineScript: |
+                az acr list -g ${{ variables.resource_group_name }}
+                az acr list
