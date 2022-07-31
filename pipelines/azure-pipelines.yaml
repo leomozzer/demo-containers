@@ -41,7 +41,7 @@ stages:
   - stage: dev
     jobs:
       - job: plan
-        displayName: Plan Dev Environment
+        displayName: Terraform Plan ACR
         steps:
         - template: ./templates/steps/azure-setup.yaml
           parameters:
@@ -97,33 +97,11 @@ stages:
           acr_name: $[ dependencies.apply.outputs['applyOutput.acr_name'] ] 
         displayName: Build and Push Mysql
         steps:
-        - task: DockerCompose@0
-          displayName: Build services
-          inputs:
-            action: Build services
-            azureSubscriptionEndpoint: ${{ variables.service_connection_name }}
-            azureContainerRegistry: '$(acr_name).azurecr.io'
-            dockerComposeFile: db/docker-compose.yml
-            projectName: mysql-$(System.StageName)
-            qualifyImageNames: ${{ variables.qualify_image_names }}
-            
-        - task: DockerCompose@0
-          displayName: Push services
-          inputs:
-            action: Push services
-            containerregistrytype: Azure Container Registry
-            azureSubscriptionEndpoint: ${{ variables.service_connection_name }}
-            azureContainerRegistry: '$(acr_name).azurecr.io'
-            dockerComposeFile: db/docker-compose.yml
-            projectName: mysql-$(System.StageName)
-            qualifyImageNames: ${{ variables.qualify_image_names }}
-        # - bash: |
-        #     echo $(myVarFromJobA)
-          # - task: AzureCLI@2
-          #   displayName: 'Get ACR Name'
-          #   inputs:
-          #     azureSubscription: ${{ variables.service_connection_name }}
-          #     scriptType: 'bash'
-          #     scriptLocation: inlineScript  
-          #     inlineScript: |
-          #       echo $(myVarFromJobA)
+        - template: ./templates/steps/docker.yaml
+            parameters:
+              stage: dev
+              service_connection_name: ${{ variables.service_connection_name }}
+              azure_container_registry: '$(acr_name).azurecr.io'
+              docker_compose_file: db/docker-compose.yml
+              project_name: mysql-$(System.StageName)
+              qualify_image_names: false
