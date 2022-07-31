@@ -76,7 +76,9 @@ stages:
               project_name: ${{ variables.project_name }}
               working_path: '${{ variables.tf_script_path }}/terraform-acr'
 
-      - job: buildpush
+      - job: mysqlbuildpush
+        dependsOn: apply
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
         displayName: Build and Push Mysql
         steps:
           - task: AzureCLI@2
@@ -86,5 +88,5 @@ stages:
               scriptType: 'bash'
               scriptLocation: inlineScript  
               inlineScript: |
-                az acr list -g ${{ variables.resource_group_name }}
-                az acr list
+                get_acr=$(az acr list -g ${{ variables.resource_group_name }})
+                acr_name=$get_acr[0]["name"]
