@@ -86,8 +86,7 @@ stages:
               workingDirectory: '${{ variables.tf_script_path }}/terraform-acr'
 
           - bash: |
-              get_acr_name=$(jq .acr_name.value.output ${{ variables.tf_script_path }}/terraform-acr/output.json)
-              acr_name=${get_acr_name} | tr -d '"'
+              get_acr_name=$(jq -r .acr_name.value.output ${{ variables.tf_script_path }}/terraform-acr/output.json)
               echo "##vso[task.setvariable variable=acr_name;isoutput=true]${acr_name}"
             name: applyOutput
 
