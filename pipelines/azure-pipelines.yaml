@@ -95,11 +95,13 @@ stages:
           myVarFromJobA: $[ dependencies.apply.outputs['passOutput.acr_name'] ] 
         displayName: Build and Push Mysql
         steps:
-          - task: AzureCLI@2
-            displayName: 'Get ACR Name'
-            inputs:
-              azureSubscription: ${{ variables.service_connection_name }}
-              scriptType: 'bash'
-              scriptLocation: inlineScript  
-              inlineScript: |
-                echo $(myVarFromJobA)
+        - bash: |
+            echo $(myVarFromJobA)
+          # - task: AzureCLI@2
+          #   displayName: 'Get ACR Name'
+          #   inputs:
+          #     azureSubscription: ${{ variables.service_connection_name }}
+          #     scriptType: 'bash'
+          #     scriptLocation: inlineScript  
+          #     inlineScript: |
+          #       echo $(myVarFromJobA)
