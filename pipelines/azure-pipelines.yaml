@@ -97,7 +97,7 @@ stages:
           acr_name: $[ dependencies.apply.outputs['applyOutput.acr_name'] ] 
         displayName: Build and Push Mysql
         steps:
-          - task: DockerCompose@0
+        - task: DockerCompose@0
           displayName: Build services
           inputs:
             action: Build services
