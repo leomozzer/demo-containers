@@ -9,13 +9,13 @@ parameters:
 steps:
   - task: DockerCompose@0
     displayName: Build services
-      inputs:
-        action: Build services
-        azureSubscriptionEndpoint: ${{ parameters.service_connection_name }}
-        azureContainerRegistry: ${{ parameters.azure_container_registry }}
-        dockerComposeFile: ${{ parameters.docker_compose_file }}
-        projectName: ${{ parameters.project_name }}
-        qualifyImageNames: ${{ parameters.qualify_image_names }}
+    inputs:
+      action: Build services
+      azureSubscriptionEndpoint: ${{ parameters.service_connection_name }}
+      azureContainerRegistry: ${{ parameters.azure_container_registry }}
+      dockerComposeFile: ${{ parameters.docker_compose_file }}
+      projectName: ${{ parameters.project_name }}
+      qualifyImageNames: ${{ parameters.qualify_image_names }}
             
     - task: DockerCompose@0
       displayName: Push services
