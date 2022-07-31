@@ -11,3 +11,10 @@ output "admin_password" {
     "output" : azurerm_container_registry.acr.admin_password
   }
 }
+
+output "acr_name" {
+  value = {
+    "key" : "admin-password"
+    "output" : azurerm_container_registry.acr.name
+  }
+}
