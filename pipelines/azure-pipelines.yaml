@@ -89,4 +89,6 @@ stages:
               scriptLocation: inlineScript  
               inlineScript: |
                 get_acr=$(az acr list -g ${{ variables.resource_group_name }})
-                acr_name=$get_acr[0]["name"]
+                echo "${get_acr}"
+                acr_name={$get_acr[0]["name"]}
+                echo "${acr_name}"
