@@ -98,10 +98,9 @@ stages:
         displayName: Build and Push Mysql
         steps:
         - template: ./templates/steps/docker.yaml
-            parameters:
-              stage: dev
-              service_connection_name: ${{ variables.service_connection_name }}
-              azure_container_registry: '$(acr_name).azurecr.io'
-              docker_compose_file: db/docker-compose.yml
-              project_name: mysql-$(System.StageName)
-              qualify_image_names: false
+          parameters:
+            service_connection_name: ${{ variables.service_connection_name }}
+            azure_container_registry: '$(acr_name).azurecr.io'
+            docker_compose_file: db/docker-compose.yml
+            project_name: mysql-$(System.StageName)
+            qualify_image_names: false
