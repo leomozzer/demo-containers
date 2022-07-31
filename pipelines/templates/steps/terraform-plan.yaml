@@ -7,6 +7,7 @@ parameters:
   service_connection_name: ""
   project_name: ""
   working_path: ""
+  var_file: ""
 
 
 steps:
@@ -26,7 +27,7 @@ steps:
     displayName: "Ensure ${{ parameters.stage }}.tfvars"
     inputs:
       targetType: "inline"
-      script: touch ${{ parameters.working_path }}/${{ parameters.stage }}.tfvars
+      script: touch ${{ parameters.var_file }}
 
   # Workaround for https://github.com/microsoft/azure-pipelines-extensions/issues/664
   - powershell: New-Item -Path "${{ parameters.working_path }}" -Name "backend.tf" -Value "terraform {`r`nbackend `"azurerm`" {}`r`n}"
@@ -52,7 +53,7 @@ steps:
     displayName: 'Terraform Plan ${{ parameters.stage }}'
     inputs:
       command: plan
-      commandOptions: '-var-file="${{ parameters.stage }}.tfvars" -lock-timeout=10m -out=${{ parameters.stage }}.plan'
+      commandOptions: '-var-file="${{ parameters.var_file }}" -lock-timeout=10m -out=${{ parameters.stage }}.plan'
       environmentServiceNameAzureRM: ${{ parameters.service_connection_name }}
       workingDirectory: '${{ parameters.working_path }}'
       

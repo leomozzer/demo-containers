@@ -19,6 +19,7 @@ variables:
   tfstate_storage_account_name: "stacdev"
   tf_version: 1.2.6
   tf_script_path: "$(System.DefaultWorkingDirectory)/terraform-live"
+  resource_group_name: "demo-containers-dev"
   #tf_modules_path: '$(System.DefaultWorkingDirectory)/terraform-modules'
 
 pool:
@@ -58,6 +59,7 @@ stages:
             tf_version: ${{ variables.tf_version }}
             project_name: ${{ variables.project_name }}
             working_path: '${{ variables.tf_script_path }}/terraform-acr'
+            var_file: '${{ variables.tf_script_path }}/dev.tfvars'
 
       - job: apply
         dependsOn: plan
@@ -73,20 +75,3 @@ stages:
               tf_version: ${{ variables.tf_version }}
               project_name: ${{ variables.project_name }}
               working_path: '${{ variables.tf_script_path }}/terraform-acr'
-
-          - task: Bash@3
-            displayName: 'Terraform Output'
-            inputs:
-              targetType: 'inline'
-              script: |
-                terraform output -json > ./output.json
-              workingDirectory: '${{ variables.tf_script_path }}/terraform-acr'
-          
-          - task: PowerShell@2
-            displayName: 'Resource Group name'
-            inputs:
-              targetType: 'inline'
-              script: |
-                $data = Get-content ${{ variables.tf_script_path }}/terraform-acr/output.json | out-string | ConvertFrom-Json
-                $resource_group_name = $data.resource_group_name.value
-                Write-Host "##vso[task.setvariable variable=resource_group_name;]$resource_group_name"
