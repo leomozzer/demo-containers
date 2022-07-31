@@ -33,10 +33,10 @@ stages:
       - job: TFSecJobMain
         displayName: TFSec Scan terraform-acr
         steps:
-          - template: ./templates/steps/tfsec.yaml
-            parameters:
-              artifact_name: 'terraform-acr'
-              working_path: '${{ variables.tf_script_path }}/terraform-acr'
+        - template: ./templates/steps/tfsec.yaml
+          parameters:
+            artifact_name: 'terraform-acr'
+            working_path: '${{ variables.tf_script_path }}/terraform-acr'
 
   - stage: dev
     jobs:
@@ -67,28 +67,28 @@ stages:
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
         displayName: Terraform Apply ACR
         steps:
-          - template: ./templates/steps/terraform-apply.yaml
-            parameters:
-              stage: dev
-              tfstate_storage_account_resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
-              service_connection_name: ${{ variables.service_connection_name }}
-              tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
-              tf_version: ${{ variables.tf_version }}
-              project_name: ${{ variables.project_name }}
-              working_path: '${{ variables.tf_script_path }}/terraform-acr'
+        - template: ./templates/steps/terraform-apply.yaml
+          parameters:
+            stage: dev
+            tfstate_storage_account_resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
+            service_connection_name: ${{ variables.service_connection_name }}
+            tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
+            tf_version: ${{ variables.tf_version }}
+            project_name: ${{ variables.project_name }}
+            working_path: '${{ variables.tf_script_path }}/terraform-acr'
 
-          - task: Bash@3
-            displayName: 'Terraform Output'
-            inputs:
-              targetType: 'inline'
-              script: |
-                terraform output -json > ./output.json
-              workingDirectory: '${{ variables.tf_script_path }}/terraform-acr'
+        - task: Bash@3
+          displayName: 'Terraform Output'
+          inputs:
+            targetType: 'inline'
+            script: |
+              terraform output -json > ./output.json
+            workingDirectory: '${{ variables.tf_script_path }}/terraform-acr'
 
-          - bash: |
-              get_acr_name=$(jq -r .acr_name.value.output ${{ variables.tf_script_path }}/terraform-acr/output.json)
-              echo "##vso[task.setvariable variable=acr_name;isoutput=true]${get_acr_name}"
-            name: applyOutput
+        - bash: |
+            get_acr_name=$(jq -r .acr_name.value.output ${{ variables.tf_script_path }}/terraform-acr/output.json)
+            echo "##vso[task.setvariable variable=acr_name;isoutput=true]${get_acr_name}"
+          name: applyOutput
 
       - job: mysqlbuildpush
         dependsOn: applyAcr
@@ -97,13 +97,6 @@ stages:
           acr_name: $[ dependencies.apply.outputs['applyOutput.acr_name'] ] 
         displayName: Build and Push Mysql
         steps:
-        # - template: ./templates/steps/docker.yaml
-        #   parameters:
-        #     service_connection_name: ${{ variables.service_connection_name }}
-        #     azure_container_registry: '$(acr_name).azurecr.io'
-        #     docker_compose_file: db/docker-compose.yml
-        #     project_name: mysql-$(System.StageName)
-        #     qualify_image_names: false
         - task: DockerCompose@0
           displayName: Build services
           inputs:
@@ -124,3 +117,17 @@ stages:
             dockerComposeFile: db/docker-compose.yml
             projectName: mysql-$(System.StageName)
             qualifyImageNames: ${{ variables.qualify_image_names }}
+
+      - job: planAcg
+        displayName: Terraform Plan ACR
+        steps:
+        - template: ./templates/steps/terraform-plan.yaml
+          parameters: 
+            stage: dev
+            tfstate_storage_account_resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
+            service_connection_name: ${{ variables.service_connection_name }}
+            tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
+            tf_version: ${{ variables.tf_version }}
+            project_name: ${{ variables.project_name }}
+            working_path: '${{ variables.tf_script_path }}/terraform-acg'
+            var_file: '${{ variables.tf_script_path }}/dev.tfvars'
