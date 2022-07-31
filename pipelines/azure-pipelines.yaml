@@ -84,6 +84,8 @@ stages:
                 terraform output -json > ./output.json
                 jq . output.json
                 jq .acr_name output.json
+                jq .acr_name.value.output output.json
+                echo "##vso[task.setvariable variable=myOutputVar;isoutput=true]jq .acr_name.value.output output.json"
               workingDirectory: '${{ variables.tf_script_path }}/terraform-acr'
 
       # - job: mysqlbuildpush
@@ -98,7 +100,4 @@ stages:
       #         scriptType: 'bash'
       #         scriptLocation: inlineScript  
       #         inlineScript: |
-      #           get_acr=$(az acr list -g ${{ variables.resource_group_name }})
-      #           echo "${get_acr}"
-      #           acr_name={$get_acr[0]}
-      #           echo "${acr_name}"
+      #           echo 
