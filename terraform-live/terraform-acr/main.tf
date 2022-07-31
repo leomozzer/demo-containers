@@ -11,7 +11,7 @@ locals {
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = "${local.random_result}-${var.app_name}-${var.stage}-rg"
+  name     = var.resource_group_name #"${local.random_result}-${var.app_name}-${var.stage}-rg"
   location = var.rg_location
 }
 

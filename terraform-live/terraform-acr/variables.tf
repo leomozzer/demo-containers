@@ -14,3 +14,8 @@ variable "rg_location" {
   type        = string
   default     = "West Europe"
 }
+
+variable "resource_group_name" {
+  description = "Resource group name"
+  type        = string
+}
