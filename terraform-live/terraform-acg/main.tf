@@ -10,7 +10,7 @@ locals {
 }
 
 module "keyvault" {
-  source                      = "../terraform-modules/keyvault"
+  source                      = "../../terraform-modules/keyvault"
   resource_group_name         = data.azurerm_resource_group.rg.name
   location                    = data.azurerm_resource_group.rg.location
   keyvault_name               = "${local.random_result}-kv"
