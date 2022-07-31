@@ -21,13 +21,13 @@ steps:
       scriptType: bash
       scriptLocation: inlineScript
       inlineScript: |
-        mkdir terraform-live
+        mkdir ${{ parameters.working_path }}
         az storage blob download \
           --file terraform-live.tar \
           --name "$(Build.BuildNumber)-live-${{ parameters.stage }}.tar" \
           --account-name "${{ parameters.tfstate_storage_account_name }}" \
           --container-name plans
-        tar -xvf terraform-live.tar -C terraform-live
+        tar -xvf terraform-live.tar -C ${{ parameters.working_path }}
 
   # - task: AzureCLI@2
   #   displayName: Copy ${{ parameters.stage }} terraform-modules folder from Storage
