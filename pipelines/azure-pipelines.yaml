@@ -119,7 +119,7 @@ stages:
             qualifyImageNames: ${{ variables.qualify_image_names }}
 
       - job: planAcg
-        displayName: Terraform Plan ACR
+        displayName: Terraform Plan ACG
         steps:
         - template: ./templates/steps/terraform-plan.yaml
           parameters: 
