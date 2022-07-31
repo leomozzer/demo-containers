@@ -20,6 +20,7 @@ variables:
   tf_version: 1.2.6
   tf_script_path: "$(System.DefaultWorkingDirectory)/terraform-live"
   resource_group_name: "demo-containers-dev"
+  qualify_image_names: true
   #tf_modules_path: '$(System.DefaultWorkingDirectory)/terraform-modules'
 
 pool:
@@ -87,17 +88,37 @@ stages:
           - bash: |
               get_acr_name=$(jq .acr_name.value.output ${{ variables.tf_script_path }}/terraform-acr/output.json)
               echo "##vso[task.setvariable variable=acr_name;isoutput=true]${get_acr_name}"
-            name: passOutput
+            name: applyOutput
 
       - job: mysqlbuildpush
         dependsOn: apply
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
         variables:
-          myVarFromJobA: $[ dependencies.apply.outputs['passOutput.acr_name'] ] 
+          acr_name: $[ dependencies.apply.outputs['applyOutput.acr_name'] ] 
         displayName: Build and Push Mysql
         steps:
-        - bash: |
-            echo $(myVarFromJobA)
+          - task: DockerCompose@0
+          displayName: Build services
+          inputs:
+            action: Build services
+            azureSubscriptionEndpoint: ${{ variables.service_connection_name }}
+            azureContainerRegistry: '$(acr_name).azurecr.io'
+            dockerComposeFile: db/docker-compose.yml
+            projectName: mysql-$(System.StageName)
+            qualifyImageNames: ${{ variables.qualify_image_names }}
+            
+        - task: DockerCompose@0
+          displayName: Push services
+          inputs:
+            action: Push services
+            containerregistrytype: Azure Container Registry
+            azureSubscriptionEndpoint: ${{ variables.service_connection_name }}
+            azureContainerRegistry: '$(acr_name).azurecr.io'
+            dockerComposeFile: db/docker-compose.yml
+            projectName: mysql-$(System.StageName)
+            qualifyImageNames: ${{ variables.qualify_image_names }}
+        # - bash: |
+        #     echo $(myVarFromJobA)
           # - task: AzureCLI@2
           #   displayName: 'Get ACR Name'
           #   inputs:
