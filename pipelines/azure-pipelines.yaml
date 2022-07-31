@@ -82,22 +82,24 @@ stages:
               targetType: 'inline'
               script: |
                 terraform output -json > ./output.json
-                jq . output.json
-                jq .acr_name output.json
-                jq .acr_name.value.output output.json
-                echo "##vso[task.setvariable variable=myOutputVar;isoutput=true]jq .acr_name.value.output output.json"
               workingDirectory: '${{ variables.tf_script_path }}/terraform-acr'
 
-      # - job: mysqlbuildpush
-      #   dependsOn: apply
-      #   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-      #   displayName: Build and Push Mysql
-      #   steps:
-      #     - task: AzureCLI@2
-      #       displayName: 'Get ACR Name'
-      #       inputs:
-      #         azureSubscription: ${{ variables.service_connection_name }}
-      #         scriptType: 'bash'
-      #         scriptLocation: inlineScript  
-      #         inlineScript: |
-      #           echo 
+          - bash: |
+              echo "##vso[task.setvariable variable=acr_name;isoutput=true]jq .acr_name.value.output ${{ variables.tf_script_path }}/terraform-acr/output.json"
+            name: passOutput
+
+      - job: mysqlbuildpush
+        dependsOn: apply
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+        variables:
+          myVarFromJobA: $[ dependencies.apply.outputs['passOutput.acr_name'] ] 
+        displayName: Build and Push Mysql
+        steps:
+          - task: AzureCLI@2
+            displayName: 'Get ACR Name'
+            inputs:
+              azureSubscription: ${{ variables.service_connection_name }}
+              scriptType: 'bash'
+              scriptLocation: inlineScript  
+              inlineScript: |
+                echo $(myVarFromJobA)
