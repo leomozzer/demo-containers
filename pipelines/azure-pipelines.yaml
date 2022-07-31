@@ -40,7 +40,7 @@ stages:
 
   - stage: dev
     jobs:
-      - job: plan
+      - job: planAcr
         displayName: Terraform Plan ACR
         steps:
         - template: ./templates/steps/azure-setup.yaml
@@ -62,8 +62,8 @@ stages:
             working_path: '${{ variables.tf_script_path }}/terraform-acr'
             var_file: '${{ variables.tf_script_path }}/dev.tfvars'
 
-      - job: apply
-        dependsOn: plan
+      - job: applyAcr
+        dependsOn: planAcr
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
         displayName: Terraform Apply ACR
         steps:
@@ -91,7 +91,7 @@ stages:
             name: applyOutput
 
       - job: mysqlbuildpush
-        dependsOn: apply
+        dependsOn: applyAcr
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
         variables:
           acr_name: $[ dependencies.apply.outputs['applyOutput.acr_name'] ] 
