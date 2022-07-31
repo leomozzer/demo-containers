@@ -94,7 +94,7 @@ stages:
         dependsOn: applyAcr
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
         variables:
-          acr_name: $[ dependencies.apply.outputs['applyOutput.acr_name'] ] 
+          acr_name: $[ dependencies.applyAcr.outputs['applyOutput.acr_name'] ] 
         displayName: Build and Push Mysql
         steps:
         - task: DockerCompose@0
