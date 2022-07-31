@@ -45,7 +45,7 @@ stages:
         steps:
         - template: ./templates/steps/azure-setup.yaml
           parameters:
-            tags: '"UseCase=Terraform" "Stage=dev"'
+            tags: '"UseCase=Terraform" "Stage=$(System.StageName)"'
             resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
             storage_account_name: ${{ variables.tfstate_storage_account_name }}
             resource_group_location: "westus"
@@ -53,14 +53,14 @@ stages:
 
         - template: ./templates/steps/terraform-plan.yaml
           parameters: 
-            stage: dev
+            stage: $(System.StageName)
             tfstate_storage_account_resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
             service_connection_name: ${{ variables.service_connection_name }}
             tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
             tf_version: ${{ variables.tf_version }}
             project_name: ${{ variables.project_name }}
             working_path: '${{ variables.tf_script_path }}/terraform-acr'
-            var_file: '${{ variables.tf_script_path }}/dev.tfvars'
+            var_file: '${{ variables.tf_script_path }}/$(System.StageName).tfvars'
 
       - job: applyAcr
         dependsOn: planAcr
@@ -69,7 +69,7 @@ stages:
         steps:
         - template: ./templates/steps/terraform-apply.yaml
           parameters:
-            stage: dev
+            stage: $(System.StageName)
             tfstate_storage_account_resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
             service_connection_name: ${{ variables.service_connection_name }}
             tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
@@ -123,11 +123,11 @@ stages:
         steps:
         - template: ./templates/steps/terraform-plan.yaml
           parameters: 
-            stage: dev
+            stage: $(System.StageName)
             tfstate_storage_account_resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
             service_connection_name: ${{ variables.service_connection_name }}
             tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
             tf_version: ${{ variables.tf_version }}
             project_name: ${{ variables.project_name }}
             working_path: '${{ variables.tf_script_path }}/terraform-acg'
-            var_file: '${{ variables.tf_script_path }}/dev.tfvars'
+            var_file: '${{ variables.tf_script_path }}/$(System.StageName).tfvars'
