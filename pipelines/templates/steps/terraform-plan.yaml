@@ -47,7 +47,7 @@ steps:
       backendAzureRmStorageAccountName: ${{ parameters.tfstate_storage_account_name }}
       backendAzureRmContainerName: states
       backendAzureRmKey: "${{ parameters.project_name }}.tfstate"
-      commandOptions: "-reconfigure"
+      #commandOptions: "-reconfigure"
 
   - task: TerraformTaskV2@2
     displayName: 'Terraform Plan ${{ parameters.stage }}'
