@@ -8,6 +8,8 @@ parameters:
   project_name: ""
   working_path: ""
   tfstate_file_name: ""
+  var_file: ""
+  
 
 steps:
   - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0

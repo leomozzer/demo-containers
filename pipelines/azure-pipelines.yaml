@@ -78,6 +78,7 @@ stages:
             project_name: ${{ variables.project_name }}
             working_path: '${{ variables.tf_script_path }}/terraform-acr'
             tfstate_file_name: 'terraform-acr.tfstate'
+            var_file: '${{ variables.tf_script_path }}/$(System.StageName).tfvars'
 
         - task: Bash@3
           displayName: 'Terraform Output'
@@ -152,3 +153,4 @@ stages:
             project_name: ${{ variables.project_name }}
             working_path: '${{ variables.tf_script_path }}/terraform-acg'
             tfstate_file_name: 'terraform-acg.tfstate'
+            var_file: '${{ variables.tf_script_path }}/$(System.StageName).tfvars'
