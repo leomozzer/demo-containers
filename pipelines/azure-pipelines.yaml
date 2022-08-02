@@ -61,6 +61,7 @@ stages:
             project_name: ${{ variables.project_name }}
             working_path: '${{ variables.tf_script_path }}/terraform-acr'
             var_file: '${{ variables.tf_script_path }}/$(System.StageName).tfvars'
+            tfstate_file_name: 'terraform-acr.tfstate'
 
       - job: applyAcr
         dependsOn: planAcr
@@ -133,3 +134,4 @@ stages:
             project_name: ${{ variables.project_name }}
             working_path: '${{ variables.tf_script_path }}/terraform-acg'
             var_file: '${{ variables.tf_script_path }}/$(System.StageName).tfvars'
+            tfstate_file_name: 'terraform-acg.tfstate'

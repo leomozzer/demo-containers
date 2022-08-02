@@ -8,6 +8,7 @@ parameters:
   project_name: ""
   working_path: ""
   var_file: ""
+  tfstate_file_name: ""
 
 
 steps:
@@ -46,7 +47,7 @@ steps:
       backendAzureRmResourceGroupName: ${{ parameters.tfstate_storage_account_resource_group_name }}
       backendAzureRmStorageAccountName: ${{ parameters.tfstate_storage_account_name }}
       backendAzureRmContainerName: states
-      backendAzureRmKey: "${{ parameters.project_name }}.tfstate"
+      backendAzureRmKey: "${{ parameters.tfstate_file_name }}"
       #commandOptions: "-reconfigure"
 
   - task: TerraformTaskV2@2
