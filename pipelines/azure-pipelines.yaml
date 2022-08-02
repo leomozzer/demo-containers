@@ -77,6 +77,7 @@ stages:
             tf_version: ${{ variables.tf_version }}
             project_name: ${{ variables.project_name }}
             working_path: '${{ variables.tf_script_path }}/terraform-acr'
+            tfstate_file_name: 'terraform-acr.tfstate'
 
         - task: Bash@3
           displayName: 'Terraform Output'
@@ -134,4 +135,20 @@ stages:
             project_name: ${{ variables.project_name }}
             working_path: '${{ variables.tf_script_path }}/terraform-acg'
             var_file: '${{ variables.tf_script_path }}/$(System.StageName).tfvars'
+            tfstate_file_name: 'terraform-acg.tfstate'
+      
+      - job: applyAcg
+        dependsOn: [planAcg]
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+        displayName: Terraform Apply ACG
+        steps:
+        - template: ./templates/steps/terraform-apply.yaml
+          parameters:
+            stage: $(System.StageName)
+            tfstate_storage_account_resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
+            service_connection_name: ${{ variables.service_connection_name }}
+            tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
+            tf_version: ${{ variables.tf_version }}
+            project_name: ${{ variables.project_name }}
+            working_path: '${{ variables.tf_script_path }}/terraform-acg'
             tfstate_file_name: 'terraform-acg.tfstate'
