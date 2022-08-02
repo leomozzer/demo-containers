@@ -61,6 +61,6 @@ steps:
     displayName: 'Terraform Apply ${{ parameters.stage }}'
     inputs:
       command: apply
-      commandOptions: "-lock-timeout=10m ${{ parameters.stage }}.plan"
+      commandOptions: "-lock-timeout=10m -var-file="${{ parameters.var_file }}" -input=false -auto-approve"
       environmentServiceNameAzureRM: ${{ parameters.service_connection_name }}
       workingDirectory: ${{ parameters.working_path }}
