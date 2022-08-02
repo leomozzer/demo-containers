@@ -58,13 +58,13 @@ steps:
       environmentServiceNameAzureRM: ${{ parameters.service_connection_name }}
       workingDirectory: '${{ parameters.working_path }}'
       
-  - task: ArchiveFiles@2
-    displayName: Archive terraform-live and plan-files
-    inputs:
-      includeRootFolder: false
-      rootFolderOrFile: ${{ parameters.working_path }}
-      archiveType: tar
-      archiveFile: terraform-live-${{ parameters.stage }}.tar
+  # - task: ArchiveFiles@2
+  #   displayName: Archive terraform-live and plan-files
+  #   inputs:
+  #     includeRootFolder: false
+  #     rootFolderOrFile: ${{ parameters.working_path }}
+  #     archiveType: tar
+  #     archiveFile: ${{ parameters.tfstate_file_name }}-${{ parameters.stage }}.tar
 
   # - task: ArchiveFiles@2
   #   displayName: Archive terraform-modules
@@ -74,18 +74,18 @@ steps:
   #     archiveType: tar
   #     archiveFile: terraform-modules-${{ parameters.stage }}.tar
 
-  - task: AzureCLI@2
-    displayName: Copy ${{ parameters.stage }} plan of TF-Live to Storage
-    inputs:
-      azureSubscription: ${{ parameters.service_connection_name }}
-      scriptType: bash
-      scriptLocation: inlineScript
-      inlineScript: |
-        az storage blob upload \
-          --container-name plans \
-          --file terraform-live-${{ parameters.stage }}.tar \
-          --name "$(Build.BuildNumber)-live-${{ parameters.stage }}.tar" \
-          --account-name "${{ parameters.tfstate_storage_account_name }}"
+  # - task: AzureCLI@2
+  #   displayName: Copy ${{ parameters.stage }} plan of TF-Live to Storage
+  #   inputs:
+  #     azureSubscription: ${{ parameters.service_connection_name }}
+  #     scriptType: bash
+  #     scriptLocation: inlineScript
+  #     inlineScript: |
+  #       az storage blob upload \
+  #         --container-name plans \
+  #         --file ${{ parameters.tfstate_file_name }}-${{ parameters.stage }}.tar-${{ parameters.stage }}.tar \
+  #         --name "$(Build.BuildNumber)-live-${{ parameters.stage }}.tar" \
+  #         --account-name "${{ parameters.tfstate_storage_account_name }}"
 
   # - task: AzureCLI@2
   #   displayName: Copy ${{ parameters.stage }} plan of TF-Modules to Storage
