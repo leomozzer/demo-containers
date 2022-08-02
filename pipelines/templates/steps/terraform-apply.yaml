@@ -7,6 +7,7 @@ parameters:
   service_connection_name: ""
   project_name: ""
   working_path: ""
+  tfstate_file_name: ""
 
 steps:
   - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
@@ -14,20 +15,32 @@ steps:
     inputs:
       terraformVersion: ${{ parameters.tf_version }}
 
-  - task: AzureCLI@2
-    displayName: Copy ${{ parameters.stage }} terraform-live folder from Storage
+  - task: TerraformTaskV2@2
+    displayName: "Terraform Init ${{ parameters.stage }}"
     inputs:
-      azureSubscription: ${{ parameters.service_connection_name }}
-      scriptType: bash
-      scriptLocation: inlineScript
-      inlineScript: |
-        mkdir ${{ parameters.working_path }}
-        az storage blob download \
-          --file terraform-live.tar \
-          --name "$(Build.BuildNumber)-live-${{ parameters.stage }}.tar" \
-          --account-name "${{ parameters.tfstate_storage_account_name }}" \
-          --container-name plans
-        tar -xvf terraform-live.tar -C ${{ parameters.working_path }}
+      provider: "azurerm"
+      command: "init"
+      workingDirectory: '${{ parameters.working_path }}'
+      backendServiceArm: ${{ parameters.service_connection_name }}
+      backendAzureRmResourceGroupName: ${{ parameters.tfstate_storage_account_resource_group_name }}
+      backendAzureRmStorageAccountName: ${{ parameters.tfstate_storage_account_name }}
+      backendAzureRmContainerName: states
+      backendAzureRmKey: "${{ parameters.tfstate_file_name }}"
+
+  # - task: AzureCLI@2
+  #   displayName: Copy ${{ parameters.stage }} terraform-live folder from Storage
+  #   inputs:
+  #     azureSubscription: ${{ parameters.service_connection_name }}
+  #     scriptType: bash
+  #     scriptLocation: inlineScript
+  #     inlineScript: |
+  #       mkdir ${{ parameters.working_path }}
+  #       az storage blob download \
+  #         --file terraform-live.tar \
+  #         --name "$(Build.BuildNumber)-live-${{ parameters.stage }}.tar" \
+  #         --account-name "${{ parameters.tfstate_storage_account_name }}" \
+  #         --container-name plans
+  #       tar -xvf terraform-live.tar -C ${{ parameters.working_path }}
 
   # - task: AzureCLI@2
   #   displayName: Copy ${{ parameters.stage }} terraform-modules folder from Storage
