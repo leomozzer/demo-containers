@@ -24,6 +24,21 @@ module "acr" {
   admin_enabled       = true
 }
 
+module "vent" {
+  source              = "../../terraform-modules/vnet"
+  nsg_name            = "${local.random_result}nsg"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  vnet_name           = "${local.random_result}-vnet"
+}
+
+module "public_ip" {
+  source              = "../../terraform-modules/public-ip"
+  name                = "${local.random_result}public-ip"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+}
+
 module "keyvault" {
   source                      = "../../terraform-modules/keyvault"
   resource_group_name         = azurerm_resource_group.rg.name

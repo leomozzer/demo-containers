@@ -176,3 +176,15 @@ acr-name -> value of the user of the ACR
 * Run the pipeline and allow it to access the items needed
 
 
+######
+
+
+- in terraform-acr
+```
+terraform plan -var-file "../dev.tfvars" -out "dev.plan"
+terraform apply "dev.plan"
+terraform destroy -var-file "../dev.tfvars"
+```
+
+https://docs.microsoft.com/en-us/azure/container-instances/container-instances-application-gateway
+https://truestorydavestorey.medium.com/how-to-get-an-azure-container-instance-running-inside-a-vnet-with-a-fileshare-mount-using-terraform-a12f5b2b86ce

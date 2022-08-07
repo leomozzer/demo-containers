@@ -11,9 +11,10 @@ resource "azurerm_container_group" "acg" {
     server   = var.acr_server
   }
 
-  container {
-    for_each = { for container in var.container_list : container => container }
-  }
+
+  # container {
+  #   for_each = { for container in var.container_list : container => container }
+  # }
   # container {
   #   for_each = { for container in var.container_list : container.name => container }
   #   name     = each.value.name
