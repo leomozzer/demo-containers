@@ -129,7 +129,7 @@ stages:
         displayName: Build and Push NodeJS Api
         steps:
         - bash: |
-            echo "##vso[task.setvariable variable=acr_name;isoutput=true]${acr_name}"
+            echo "##vso[task.setvariable variable=acr_name;isoutput=true]$(acr_name)"
           name: apibuildpushOutput
           
         - task: DockerCompose@0
