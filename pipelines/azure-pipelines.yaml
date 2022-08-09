@@ -126,7 +126,7 @@ stages:
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
         variables:
           acr_name: $[ dependencies.applyAcr.outputs['applyOutput.acr_name'] ] 
-        displayName: Build and Push Mysql
+        displayName: Build and Push NodeJS Api
         steps:
         - task: DockerCompose@0
           displayName: Build services
@@ -137,6 +137,9 @@ stages:
             dockerComposeFile: api/docker-compose.yml
             projectName: api-$(System.StageName)
             qualifyImageNames: ${{ variables.qualify_image_names }}
+            dockerComposeFileArgs: |
+              MYSQL_HOST=""
+              MYSQL_PORT=3306
             
         - task: DockerCompose@0
           displayName: Push services
@@ -148,10 +151,13 @@ stages:
             dockerComposeFile: api/docker-compose.yml
             projectName: api-$(System.StageName)
             qualifyImageNames: ${{ variables.qualify_image_names }}
+            dockerComposeFileArgs: |
+              MYSQL_HOST=""
+              MYSQL_PORT=3306
 
       - job: planAcg
         displayName: Terraform Plan ACG
-        dependsOn: mysqlbuildpush
+        dependsOn: apibuildpush
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
         steps:
         - template: ./templates/steps/terraform-plan.yaml
