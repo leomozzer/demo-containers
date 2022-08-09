@@ -12,7 +12,7 @@ locals {
 module "vnet" {
   source              = "../../terraform-modules/vnet"
   nsg_name            = "${local.random_result}nsg"
-  location            = data.azurerm_resource_group.rg.location #azurerm_resource_group.rg.location
+  location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   vnet_name           = "${local.random_result}-vnet"
 }
@@ -30,4 +30,35 @@ module "network_profile" {
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   subnet_id           = module.vnet.subnet.output.id
+}
+
+resource "azurerm_container_group" "example" {
+  name                = "example-continst"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  ip_address_type     = "Private"
+  os_type             = "Linux"
+
+  image_registry_credential {
+    username = data.azurerm_container_registry.acr.admin_username
+    password = data.azurerm_container_registry.acr.admin_password
+    server   = data.azurerm_container_registry.acr.login_server
+  }
+
+  network_profile_id = module.network_profile.id.output
+
+  container {
+    name   = "mysql"
+    image  = "${data.azurerm_container_registry.acr.login_server}/mysql:latest" #"mcr.microsoft.com/azuredocs/aci-helloworld:latest"
+    cpu    = "0.5"
+    memory = "1.5"
+
+    ports {
+      port     = 3306
+      protocol = "TCP"
+    }
+  }
+  tags = {
+    environment = "testing"
+  }
 }
