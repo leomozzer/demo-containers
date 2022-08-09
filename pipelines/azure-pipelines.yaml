@@ -166,7 +166,7 @@ stages:
         variables:
           acr_name: $[ dependencies.apibuildpush.outputs['apibuildpushOutput.acr_name'] ] 
         steps:
-        - powershell: Add-Content -Path '${{ variables.tf_script_path }}/$(System.StageName).tfvars' "acr_name=$(acr_name)"
+        - powershell: Add-Content -Path '${{ variables.tf_script_path }}/$(System.StageName).tfvars' 'acr_name = "$(acr_name)"'
           displayName: "Add ACR Name"
 
         - template: ./templates/steps/terraform-plan.yaml
