@@ -128,9 +128,6 @@ stages:
           acr_name: $[ dependencies.applyAcr.outputs['applyOutput.acr_name'] ] 
         displayName: Build and Push NodeJS Api
         steps:
-        # - bash: |
-        #     echo "##vso[task.setvariable variable=acr_name;isoutput=true]$(acr_name)"
-        #   name: apibuildpushOutput
           
         - task: DockerCompose@0
           displayName: Build services
@@ -190,7 +187,7 @@ stages:
         steps:
         - powershell: Add-Content -Path '${{ variables.tf_script_path }}/$(System.StageName).tfvars' 'acr_name = "$(acr_name)"'
           displayName: "Add ACR Name"
-          
+
         - template: ./templates/steps/terraform-apply.yaml
           parameters:
             stage: $(System.StageName)
