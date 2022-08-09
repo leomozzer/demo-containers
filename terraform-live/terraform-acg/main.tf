@@ -12,8 +12,8 @@ locals {
 module "vnet" {
   source              = "../../terraform-modules/vnet"
   nsg_name            = "${local.random_result}nsg"
-  location            = data.data.azurerm_resource_group.rg.location #azurerm_resource_group.rg.location
-  resource_group_name = data.data.azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location #azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
   vnet_name           = "${local.random_result}-vnet"
 }
 
