@@ -122,7 +122,7 @@ stages:
             qualifyImageNames: ${{ variables.qualify_image_names }}
 
       - job: apibuildpush
-        dependsOn: mysqlbuildpush
+        dependsOn: applyAcr
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
         variables:
           acr_name: $[ dependencies.applyAcr.outputs['applyOutput.acr_name'] ] 
