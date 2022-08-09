@@ -14,3 +14,8 @@ variable "allocation_method" {
   type    = string
   default = "Static"
 }
+
+variable "sku" {
+  type    = string
+  default = "Standard"
+}
