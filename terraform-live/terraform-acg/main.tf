@@ -32,8 +32,12 @@ module "network_profile" {
   subnet_id           = module.vnet.subnet.output.id
 }
 
-resource "azurerm_container_group" "example" {
-  name                = "example-continst"
+output "name" {
+  value = module.network_profile.id.output
+}
+
+resource "azurerm_container_group" "mysql" {
+  name                = "mysqlacg"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   ip_address_type     = "Private"
@@ -56,6 +60,42 @@ resource "azurerm_container_group" "example" {
     ports {
       port     = 3306
       protocol = "TCP"
+    }
+  }
+  tags = {
+    environment = "testing"
+  }
+}
+
+resource "azurerm_container_group" "api" {
+  name                = "apiacg"
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+  ip_address_type     = "Public"
+  os_type             = "Linux"
+
+  image_registry_credential {
+    username = data.azurerm_container_registry.acr.admin_username
+    password = data.azurerm_container_registry.acr.admin_password
+    server   = data.azurerm_container_registry.acr.login_server
+  }
+
+  #network_profile_id = module.network_profile.id.output
+
+  container {
+    name   = "api"
+    image  = "${data.azurerm_container_registry.acr.login_server}/api:latest" #"mcr.microsoft.com/azuredocs/aci-helloworld:latest"
+    cpu    = "0.5"
+    memory = "1.5"
+
+    ports {
+      port     = 443
+      protocol = "TCP"
+    }
+
+    environment_variables = {
+      "MYSQL_HOST" = azurerm_container_group.mysql.ip_address
+      "MYSQL_PORT" = 3306
     }
   }
   tags = {
