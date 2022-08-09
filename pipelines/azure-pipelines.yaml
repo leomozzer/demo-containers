@@ -128,6 +128,9 @@ stages:
           acr_name: $[ dependencies.applyAcr.outputs['applyOutput.acr_name'] ] 
         displayName: Build and Push NodeJS Api
         steps:
+        - bash: |
+            echo $(acr_name)
+          name: applyOutput
         - task: DockerCompose@0
           displayName: Build services
           inputs:
