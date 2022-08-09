@@ -1,7 +1,7 @@
-output "subnet_id" {
+output "subnet" {
   value = {
     "key" : "subnet"
-    "output" : azurerm_virtual_network.vnet.subnet
+    "output" : azurerm_subnet.subnet
   }
 }
 
