@@ -121,6 +121,34 @@ stages:
             projectName: mysql-$(System.StageName)
             qualifyImageNames: ${{ variables.qualify_image_names }}
 
+      - job: apibuildpush
+        dependsOn: mysqlbuildpush
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+        variables:
+          acr_name: $[ dependencies.applyAcr.outputs['applyOutput.acr_name'] ] 
+        displayName: Build and Push Mysql
+        steps:
+        - task: DockerCompose@0
+          displayName: Build services
+          inputs:
+            action: Build services
+            azureSubscriptionEndpoint: ${{ variables.service_connection_name }}
+            azureContainerRegistry: '$(acr_name).azurecr.io'
+            dockerComposeFile: api/docker-compose.yml
+            projectName: api-$(System.StageName)
+            qualifyImageNames: ${{ variables.qualify_image_names }}
+            
+        - task: DockerCompose@0
+          displayName: Push services
+          inputs:
+            action: Push services
+            containerregistrytype: Azure Container Registry
+            azureSubscriptionEndpoint: ${{ variables.service_connection_name }}
+            azureContainerRegistry: '$(acr_name).azurecr.io'
+            dockerComposeFile: api/docker-compose.yml
+            projectName: api-$(System.StageName)
+            qualifyImageNames: ${{ variables.qualify_image_names }}
+
       - job: planAcg
         displayName: Terraform Plan ACG
         dependsOn: mysqlbuildpush
