@@ -26,6 +26,8 @@ resource "azurerm_subnet" "subnet" {
   }
 }
 
+##Addnew security rule
+
 resource "azurerm_network_security_group" "network_security_group" {
   name                = var.nsg_name
   location            = var.location
@@ -42,6 +44,20 @@ resource "azurerm_network_security_group" "network_security_group" {
     source_address_prefixes    = ["10.0.0.0/16"]
     destination_address_prefix = azurerm_subnet.subnet.address_prefixes[0]
   }
+}
+
+resource "azurerm_network_security_rule" "example" {
+  name                        = "test123"
+  priority                    = 100
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+  resource_group_name         = var.resource_group_name
+  network_security_group_name = azurerm_network_security_group.network_security_group.name
 }
 
 resource "azurerm_subnet_network_security_group_association" "sn-nsg-aci" {
