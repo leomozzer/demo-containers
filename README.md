@@ -188,3 +188,5 @@ terraform destroy -var-file "../dev.tfvars"
 
 https://docs.microsoft.com/en-us/azure/container-instances/container-instances-application-gateway
 https://truestorydavestorey.medium.com/how-to-get-an-azure-container-instance-running-inside-a-vnet-with-a-fileshare-mount-using-terraform-a12f5b2b86ce
+
+Try with: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mysql_database
