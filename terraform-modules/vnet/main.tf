@@ -38,7 +38,7 @@ resource "azurerm_network_security_group" "network_security_group" {
     protocol          = "Tcp"
     source_port_range = "*"
 
-    destination_port_ranges    = [22, 443, 445, 8000]
+    destination_port_ranges    = [22, 443, 445, 3306, 8000]
     source_address_prefixes    = ["10.0.0.0/16"]
     destination_address_prefix = azurerm_subnet.subnet.address_prefixes[0]
   }
