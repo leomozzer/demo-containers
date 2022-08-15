@@ -46,165 +46,164 @@ stages:
             trivy_version: '0.13.0'
             working_path: '$(System.DefaultWorkingDirectory)'
       
+  - stage: dev
+    jobs:
+      - job: planAcr
+        displayName: Terraform Plan ACR
+        steps:
+        - template: ./templates/steps/azure-setup.yaml
+          parameters:
+            tags: '"UseCase=Terraform" "Stage=$(System.StageName)"'
+            resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
+            storage_account_name: ${{ variables.tfstate_storage_account_name }}
+            resource_group_location: "westus"
+            service_connection_name: ${{ variables.service_connection_name }}
 
-  # - stage: dev
-  #   jobs:
-  #     - job: planAcr
-  #       displayName: Terraform Plan ACR
-  #       steps:
-  #       - template: ./templates/steps/azure-setup.yaml
-  #         parameters:
-  #           tags: '"UseCase=Terraform" "Stage=$(System.StageName)"'
-  #           resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
-  #           storage_account_name: ${{ variables.tfstate_storage_account_name }}
-  #           resource_group_location: "westus"
-  #           service_connection_name: ${{ variables.service_connection_name }}
+        - template: ./templates/steps/terraform-plan.yaml
+          parameters: 
+            stage: $(System.StageName)
+            tfstate_storage_account_resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
+            service_connection_name: ${{ variables.service_connection_name }}
+            tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
+            tf_version: ${{ variables.tf_version }}
+            project_name: ${{ variables.project_name }}
+            working_path: '${{ variables.tf_script_path }}/terraform-acr'
+            var_file: '${{ variables.tf_script_path }}/$(System.StageName).tfvars'
+            tfstate_file_name: 'terraform-acr.tfstate'
 
-  #       - template: ./templates/steps/terraform-plan.yaml
-  #         parameters: 
-  #           stage: $(System.StageName)
-  #           tfstate_storage_account_resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
-  #           service_connection_name: ${{ variables.service_connection_name }}
-  #           tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
-  #           tf_version: ${{ variables.tf_version }}
-  #           project_name: ${{ variables.project_name }}
-  #           working_path: '${{ variables.tf_script_path }}/terraform-acr'
-  #           var_file: '${{ variables.tf_script_path }}/$(System.StageName).tfvars'
-  #           tfstate_file_name: 'terraform-acr.tfstate'
+      - job: applyAcr
+        dependsOn: planAcr
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+        displayName: Terraform Apply ACR
+        steps:
+        - template: ./templates/steps/terraform-apply.yaml
+          parameters:
+            stage: $(System.StageName)
+            tfstate_storage_account_resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
+            service_connection_name: ${{ variables.service_connection_name }}
+            tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
+            tf_version: ${{ variables.tf_version }}
+            project_name: ${{ variables.project_name }}
+            working_path: '${{ variables.tf_script_path }}/terraform-acr'
+            tfstate_file_name: 'terraform-acr.tfstate'
+            var_file: '${{ variables.tf_script_path }}/$(System.StageName).tfvars'
 
-  #     - job: applyAcr
-  #       dependsOn: planAcr
-  #       condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-  #       displayName: Terraform Apply ACR
-  #       steps:
-  #       - template: ./templates/steps/terraform-apply.yaml
-  #         parameters:
-  #           stage: $(System.StageName)
-  #           tfstate_storage_account_resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
-  #           service_connection_name: ${{ variables.service_connection_name }}
-  #           tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
-  #           tf_version: ${{ variables.tf_version }}
-  #           project_name: ${{ variables.project_name }}
-  #           working_path: '${{ variables.tf_script_path }}/terraform-acr'
-  #           tfstate_file_name: 'terraform-acr.tfstate'
-  #           var_file: '${{ variables.tf_script_path }}/$(System.StageName).tfvars'
+        - task: Bash@3
+          displayName: 'Terraform Output'
+          inputs:
+            targetType: 'inline'
+            script: |
+              terraform output -json > ./output.json
+            workingDirectory: '${{ variables.tf_script_path }}/terraform-acr'
 
-  #       - task: Bash@3
-  #         displayName: 'Terraform Output'
-  #         inputs:
-  #           targetType: 'inline'
-  #           script: |
-  #             terraform output -json > ./output.json
-  #           workingDirectory: '${{ variables.tf_script_path }}/terraform-acr'
+        - bash: |
+            get_acr_name=$(jq -r .acr_name.value.output ${{ variables.tf_script_path }}/terraform-acr/output.json)
+            echo "##vso[task.setvariable variable=acr_name;isoutput=true]${get_acr_name}"
+          name: applyOutput
 
-  #       - bash: |
-  #           get_acr_name=$(jq -r .acr_name.value.output ${{ variables.tf_script_path }}/terraform-acr/output.json)
-  #           echo "##vso[task.setvariable variable=acr_name;isoutput=true]${get_acr_name}"
-  #         name: applyOutput
-
-  #     - job: mysqlbuildpush
-  #       dependsOn: applyAcr
-  #       condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-  #       variables:
-  #         acr_name: $[ dependencies.applyAcr.outputs['applyOutput.acr_name'] ] 
-  #       displayName: Build and Push Mysql
-  #       steps:
-  #       - task: DockerCompose@0
-  #         displayName: Build services
-  #         inputs:
-  #           action: Build services
-  #           azureSubscriptionEndpoint: ${{ variables.service_connection_name }}
-  #           azureContainerRegistry: '$(acr_name).azurecr.io'
-  #           dockerComposeFile: db/docker-compose.yml
-  #           projectName: mysql-$(System.StageName)
-  #           qualifyImageNames: ${{ variables.qualify_image_names }}
+      - job: mysqlbuildpush
+        dependsOn: applyAcr
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+        variables:
+          acr_name: $[ dependencies.applyAcr.outputs['applyOutput.acr_name'] ] 
+        displayName: Build and Push Mysql
+        steps:
+        - task: DockerCompose@0
+          displayName: Build services
+          inputs:
+            action: Build services
+            azureSubscriptionEndpoint: ${{ variables.service_connection_name }}
+            azureContainerRegistry: '$(acr_name).azurecr.io'
+            dockerComposeFile: db/docker-compose.yml
+            projectName: mysql-$(System.StageName)
+            qualifyImageNames: ${{ variables.qualify_image_names }}
             
-  #       - task: DockerCompose@0
-  #         displayName: Push services
-  #         inputs:
-  #           action: Push services
-  #           containerregistrytype: Azure Container Registry
-  #           azureSubscriptionEndpoint: ${{ variables.service_connection_name }}
-  #           azureContainerRegistry: '$(acr_name).azurecr.io'
-  #           dockerComposeFile: db/docker-compose.yml
-  #           projectName: mysql-$(System.StageName)
-  #           qualifyImageNames: ${{ variables.qualify_image_names }}
+        - task: DockerCompose@0
+          displayName: Push services
+          inputs:
+            action: Push services
+            containerregistrytype: Azure Container Registry
+            azureSubscriptionEndpoint: ${{ variables.service_connection_name }}
+            azureContainerRegistry: '$(acr_name).azurecr.io'
+            dockerComposeFile: db/docker-compose.yml
+            projectName: mysql-$(System.StageName)
+            qualifyImageNames: ${{ variables.qualify_image_names }}
 
-  #     - job: apibuildpush
-  #       dependsOn: [applyAcr]
-  #       condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-  #       variables:
-  #         acr_name: $[ dependencies.applyAcr.outputs['applyOutput.acr_name'] ] 
-  #       displayName: Build and Push NodeJS Api
-  #       steps:
+      - job: apibuildpush
+        dependsOn: [applyAcr]
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+        variables:
+          acr_name: $[ dependencies.applyAcr.outputs['applyOutput.acr_name'] ] 
+        displayName: Build and Push NodeJS Api
+        steps:
           
-  #       - task: DockerCompose@0
-  #         displayName: Build services
-  #         inputs:
-  #           action: Build services
-  #           azureSubscriptionEndpoint: ${{ variables.service_connection_name }}
-  #           azureContainerRegistry: '$(acr_name).azurecr.io'
-  #           dockerComposeFile: api/docker-compose.yml
-  #           projectName: api-$(System.StageName)
-  #           qualifyImageNames: ${{ variables.qualify_image_names }}
-  #           dockerComposeFileArgs: |
-  #             MYSQL_HOST=""
-  #             MYSQL_PORT=3306
+        - task: DockerCompose@0
+          displayName: Build services
+          inputs:
+            action: Build services
+            azureSubscriptionEndpoint: ${{ variables.service_connection_name }}
+            azureContainerRegistry: '$(acr_name).azurecr.io'
+            dockerComposeFile: api/docker-compose.yml
+            projectName: api-$(System.StageName)
+            qualifyImageNames: ${{ variables.qualify_image_names }}
+            dockerComposeFileArgs: |
+              MYSQL_HOST=""
+              MYSQL_PORT=3306
             
-  #       - task: DockerCompose@0
-  #         displayName: Push services
-  #         inputs:
-  #           action: Push services
-  #           containerregistrytype: Azure Container Registry
-  #           azureSubscriptionEndpoint: ${{ variables.service_connection_name }}
-  #           azureContainerRegistry: '$(acr_name).azurecr.io'
-  #           dockerComposeFile: api/docker-compose.yml
-  #           projectName: api-$(System.StageName)
-  #           qualifyImageNames: ${{ variables.qualify_image_names }}
-  #           dockerComposeFileArgs: |
-  #             MYSQL_HOST=""
-  #             MYSQL_PORT=3306
+        - task: DockerCompose@0
+          displayName: Push services
+          inputs:
+            action: Push services
+            containerregistrytype: Azure Container Registry
+            azureSubscriptionEndpoint: ${{ variables.service_connection_name }}
+            azureContainerRegistry: '$(acr_name).azurecr.io'
+            dockerComposeFile: api/docker-compose.yml
+            projectName: api-$(System.StageName)
+            qualifyImageNames: ${{ variables.qualify_image_names }}
+            dockerComposeFileArgs: |
+              MYSQL_HOST=""
+              MYSQL_PORT=3306
 
-  #     - job: planAcg
-  #       displayName: Terraform Plan ACG
-  #       dependsOn: [apibuildpush, applyAcr]
-  #       condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-  #       variables:
-  #         acr_name: $[ dependencies.applyAcr.outputs['applyOutput.acr_name'] ] 
-  #       steps:
-  #       - powershell: Add-Content -Path '${{ variables.tf_script_path }}/$(System.StageName).tfvars' 'acr_name = "$(acr_name)"'
-  #         displayName: "Add ACR Name"
+      - job: planAcg
+        displayName: Terraform Plan ACG
+        dependsOn: [apibuildpush, applyAcr]
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+        variables:
+          acr_name: $[ dependencies.applyAcr.outputs['applyOutput.acr_name'] ] 
+        steps:
+        - powershell: Add-Content -Path '${{ variables.tf_script_path }}/$(System.StageName).tfvars' 'acr_name = "$(acr_name)"'
+          displayName: "Add ACR Name"
 
-  #       - template: ./templates/steps/terraform-plan.yaml
-  #         parameters: 
-  #           stage: $(System.StageName)
-  #           tfstate_storage_account_resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
-  #           service_connection_name: ${{ variables.service_connection_name }}
-  #           tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
-  #           tf_version: ${{ variables.tf_version }}
-  #           project_name: ${{ variables.project_name }}
-  #           working_path: '${{ variables.tf_script_path }}/terraform-acg'
-  #           var_file: '${{ variables.tf_script_path }}/$(System.StageName).tfvars'
-  #           tfstate_file_name: 'terraform-acg.tfstate'
+        - template: ./templates/steps/terraform-plan.yaml
+          parameters: 
+            stage: $(System.StageName)
+            tfstate_storage_account_resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
+            service_connection_name: ${{ variables.service_connection_name }}
+            tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
+            tf_version: ${{ variables.tf_version }}
+            project_name: ${{ variables.project_name }}
+            working_path: '${{ variables.tf_script_path }}/terraform-acg'
+            var_file: '${{ variables.tf_script_path }}/$(System.StageName).tfvars'
+            tfstate_file_name: 'terraform-acg.tfstate'
       
-  #     - job: applyAcg
-  #       dependsOn: [planAcg, applyAcr]
-  #       condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-  #       variables:
-  #         acr_name: $[ dependencies.applyAcr.outputs['applyOutput.acr_name'] ] 
-  #       displayName: Terraform Apply ACG
-  #       steps:
-  #       - powershell: Add-Content -Path '${{ variables.tf_script_path }}/$(System.StageName).tfvars' 'acr_name = "$(acr_name)"'
-  #         displayName: "Add ACR Name"
+      - job: applyAcg
+        dependsOn: [planAcg, applyAcr]
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+        variables:
+          acr_name: $[ dependencies.applyAcr.outputs['applyOutput.acr_name'] ] 
+        displayName: Terraform Apply ACG
+        steps:
+        - powershell: Add-Content -Path '${{ variables.tf_script_path }}/$(System.StageName).tfvars' 'acr_name = "$(acr_name)"'
+          displayName: "Add ACR Name"
 
-  #       - template: ./templates/steps/terraform-apply.yaml
-  #         parameters:
-  #           stage: $(System.StageName)
-  #           tfstate_storage_account_resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
-  #           service_connection_name: ${{ variables.service_connection_name }}
-  #           tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
-  #           tf_version: ${{ variables.tf_version }}
-  #           project_name: ${{ variables.project_name }}
-  #           working_path: '${{ variables.tf_script_path }}/terraform-acg'
-  #           tfstate_file_name: 'terraform-acg.tfstate'
-  #           var_file: '${{ variables.tf_script_path }}/$(System.StageName).tfvars'
+        - template: ./templates/steps/terraform-apply.yaml
+          parameters:
+            stage: $(System.StageName)
+            tfstate_storage_account_resource_group_name: ${{ variables.tfstate_storage_account_resource_group_name }}
+            service_connection_name: ${{ variables.service_connection_name }}
+            tfstate_storage_account_name: ${{ variables.tfstate_storage_account_name }}
+            tf_version: ${{ variables.tf_version }}
+            project_name: ${{ variables.project_name }}
+            working_path: '${{ variables.tf_script_path }}/terraform-acg'
+            tfstate_file_name: 'terraform-acg.tfstate'
+            var_file: '${{ variables.tf_script_path }}/$(System.StageName).tfvars'
