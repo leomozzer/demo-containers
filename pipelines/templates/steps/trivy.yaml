@@ -1,0 +1,36 @@
+#TRIVY_VERSION: 0.13.0
+parameters:
+  tags: ""
+  resource_group_name: ""
+  storage_account_name: ""
+  service_connection_name: ""
+  working_path: ""
+  trivy_version: ""
+
+
+steps:
+  - task: DownloadPipelineArtifact@2
+    inputs:
+      artifactName: 'workingDirectory'
+      targetPath: ${{ parameters.working_path }}
+
+  - task: CmdLine@2
+    displayName: 'Install Trivy ${{ parameters.trivy_version}}'
+    inputs:
+      script: |
+        sudo apt-get install rpm
+        wget https://github.com/aquasecurity/trivy/releases/download/v${{ parameters.trivy_version}}/trivy_${{ parameters.trivy_version}}_Linux-64bit.deb
+        sudo dpkg -i trivy_${{ parameters.trivy_version}}_Linux-64bit.deb
+        trivy -v
+
+  - task: CmdLine@2
+    displayName: "Audit with trivy LOW, MEDIUM"
+    inputs:
+      script: |
+        trivy fs --exit-code 0 --severity LOW,MEDIUM ${{ parameters.working_path }}
+
+  - task: CmdLine@2
+    displayName: "Audit with trivy HIGH, CRITICAL"
+    inputs:
+      script: |
+        trivy fs --exit-code 1 --severity HIGH,CRITICAL ${{ parameters.working_path }}
