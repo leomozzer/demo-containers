@@ -10,6 +10,7 @@ trigger:
     - terraform-live
     - pipelines/azure-pipelines.yaml
     - pipelines/templates
+    - terraform-modules
 
 variables:
   build_counter: $[counter('build-counter-$(RELEASE_NAME)', 1)]
