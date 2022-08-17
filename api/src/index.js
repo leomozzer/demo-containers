@@ -15,37 +15,50 @@ app.get('/', (req, res) => {
 
   return res.json({
     "message": `Hello World! ${Date()}`,
-    "host": process.env.MYSQL_HOST    
+    "host": process.env.MYSQL_HOST
   })
 })
 
-const connection = mysql.createConnection({
-  host: process.env.MYSQL_HOST ? process.env.MYSQL_HOST : 'mysql',
-  user: 'root',
-  password: 'skaylink',
-  database: 'skaylinkbr',
-  port: process.env.MYSQL_PORT ? process.env.MYSQL_PORT : 3306
-});
+try {
+  console.log(`Connecting to the MySql on ${process.env.MYSQL_HOST}`)
+  const connection = mysql.createConnection({
+    host: process.env.MYSQL_HOST ? process.env.MYSQL_HOST : 'mysql',
+    user: 'root',
+    password: 'skaylink',
+    database: 'skaylinkbr',
+    port: process.env.MYSQL_PORT ? process.env.MYSQL_PORT : 3306
+  });
 
-connection.connect();
+  connection.connect();
+} catch (error) {
+  console.log(error)
+}
 
 app.get('/people', function (req, res) {
-  connection.query('SELECT * FROM people', function (error, results) {
+  try {
+    connection.query('SELECT * FROM people', function (error, results) {
 
-    if (error) {
-      throw error
-    };
-    console.log(results);
-    res.send(
-      results.map(item => ({
-        name: item.full_name,
-        email: item.email,
-        title: item.title,
-        location: item.location_name
-      })
-      )
-    );
-  });
+      if (error) {
+        throw error
+      };
+      console.log(results);
+      res.send(
+        results.map(item => ({
+          name: item.full_name,
+          email: item.email,
+          title: item.title,
+          location: item.location_name
+        })
+        )
+      );
+    });
+  }
+  catch (error) {
+    console.log(error)
+    res.json({
+      'message': JSON.stringify(error, null, 2)
+    })
+  }
 });
 
 
