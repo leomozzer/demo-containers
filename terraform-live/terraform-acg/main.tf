@@ -20,6 +20,9 @@ module "vnet" {
 }
 
 module "acrsubnet" {
+  depends_on = [
+    module.vnet
+  ]
   source                     = "../../terraform-modules/subnet"
   name                       = "acrsubnet"
   resource_group_name        = data.azurerm_resource_group.rg.name
@@ -28,7 +31,6 @@ module "acrsubnet" {
   delegation_name            = "acidelegationservice"
   service_delegation_name    = "Microsoft.ContainerInstance/containerGroups"
   service_delegation_actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
-  nsg_name                   = "${local.random_result}nsg"
 }
 
 module "network_security_group" {
@@ -57,7 +59,7 @@ module "network_security_rule" {
   protocol                     = "Tcp"
   source_port_range            = "*"
   destination_port_ranges      = [22, 443, 445, 3306, 8000]
-  source_address_prefixes      = ["10.0.0.0/16"]
+  source_address_prefixes      = ["*"]
   destination_address_prefixes = module.acrsubnet.address_prefixes.output
 }
 
@@ -67,6 +69,12 @@ module "network_profile" {
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
   subnet_id           = module.acrsubnet.subnet_id.output
+}
+
+module "subnet_network_security_group_association" {
+  source                    = "../../terraform-modules/nsg-association"
+  subnet_id                 = module.acrsubnet.subnet_id.output
+  network_security_group_id = module.network_security_group.network_security_group.output
 }
 
 # output "name" {
