@@ -10,11 +10,25 @@ locals {
 }
 
 module "vnet" {
-  source              = "../../terraform-modules/vnet"
-  nsg_name            = "${local.random_result}nsg"
-  location            = data.azurerm_resource_group.rg.location
-  resource_group_name = data.azurerm_resource_group.rg.name
-  vnet_name           = "${local.random_result}-vnet"
+  source                = "../../terraform-modules/vnet"
+  location              = data.azurerm_resource_group.rg.location
+  resource_group_name   = data.azurerm_resource_group.rg.name
+  vnet_name             = "${local.random_result}-vnet"
+  address_space         = ["10.0.0.0/16"]
+  dns_servers           = ["10.0.0.4", "10.0.0.5"]
+  subnet_address_prefix = "10.0.1.0/24"
+}
+
+module "acrsubnet" {
+  source                     = "../../terraform-modules/subnet"
+  name                       = "acrsubnet"
+  resource_group_name        = data.azurerm_resource_group.rg.name
+  virtual_network_name       = "${local.random_result}-vnet"
+  address_prefixes           = ["10.0.2.0/24"]
+  delegation_name            = "acidelegationservice"
+  service_delegation_name    = "Microsoft.ContainerInstance/containerGroups"
+  service_delegation_actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
+  nsg_name                   = "${local.random_result}nsg"
 }
 
 module "public_ip" {
