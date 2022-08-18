@@ -31,6 +31,27 @@ module "acrsubnet" {
   nsg_name                   = "${local.random_result}nsg"
 }
 
+module "network_security_group" {
+  source              = "../../terraform-modules/nsg"
+  name                = "${local.random_result}-nsg"
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+}
+
+module "network_security_rule" {
+  source                      = "../../terraform-modules/network-security-rule"
+  name                        = "from-gateway-subnet"
+  resource_group_name         = data.azurerm_resource_group.rg.name
+  network_security_group_name = "${local.random_result}-nsg"
+  priority                    = 100
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = [22, 443, 445, 3306, 8000]
+  source_address_prefixes     = module.subnet.subnet.output.address_prefixes[0]
+}
+
 module "public_ip" {
   source              = "../../terraform-modules/public-ip"
   name                = "${local.random_result}public-ip"
