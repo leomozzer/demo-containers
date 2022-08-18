@@ -31,8 +31,8 @@ variable "source_port_range" {
   type = any
 }
 
-variable "destination_port_range" {
-  type = list(number)
+variable "destination_port_ranges" {
+  type = any
 }
 
 variable "source_address_prefixes" {
@@ -40,5 +40,5 @@ variable "source_address_prefixes" {
 }
 
 variable "destination_address_prefixes" {
-  type = list(string)
+  type = any
 }

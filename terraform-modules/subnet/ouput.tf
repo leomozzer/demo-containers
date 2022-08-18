@@ -1,7 +1,13 @@
-output "subnet" {
+output "address_prefixes" {
   value = {
-    "key" : "subnet"
-    "output" : azurerm_subnet.subnet
+    "key" : "address-prefixes"
+    "output" : azurerm_subnet.subnet.address_prefixes
   }
 }
 
+output "subnet_id" {
+  value = {
+    "key" : "subnet-id"
+    "output" : azurerm_subnet.subnet.id
+  }
+}
