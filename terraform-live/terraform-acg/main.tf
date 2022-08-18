@@ -59,7 +59,7 @@ module "network_security_rule" {
   protocol                     = "Tcp"
   source_port_range            = "*"
   destination_port_ranges      = [22, 443, 445, 3306, 8000]
-  source_address_prefixes      = ["*"]
+  source_address_prefixes      = ["0.0.0.0", "255.255.255.255"]
   destination_address_prefixes = module.acrsubnet.address_prefixes.output
 }
 
