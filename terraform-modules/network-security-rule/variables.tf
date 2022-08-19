@@ -35,10 +35,10 @@ variable "destination_port_ranges" {
   type = any
 }
 
-variable "source_address_prefixes" {
-  type = list(string)
-}
+# variable "source_address_prefixes" {
+#   type = list(string)
+# }
 
-variable "destination_address_prefixes" {
-  type = any
-}
+# variable "destination_address_prefixes" {
+#   type = any
+# }
