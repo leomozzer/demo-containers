@@ -49,6 +49,9 @@ output "nsg" {
 }
 
 module "network_security_rule" {
+  depends_on = [
+    module.network_security_group
+  ]
   source                      = "../../terraform-modules/network-security-rule"
   name                        = "from-gateway-subnet"
   resource_group_name         = data.azurerm_resource_group.rg.name
@@ -64,6 +67,9 @@ module "network_security_rule" {
 }
 
 module "network_profile" {
+  depends_on = [
+    module.acrsubnet
+  ]
   source              = "../../terraform-modules/network-profile"
   name                = "${local.random_result}netprofile"
   location            = data.azurerm_resource_group.rg.location
@@ -72,6 +78,10 @@ module "network_profile" {
 }
 
 module "subnet_network_security_group_association" {
+  depends_on = [
+    module.acrsubnet,
+    module.network_security_group
+  ]
   source                    = "../../terraform-modules/nsg-association"
   subnet_id                 = module.acrsubnet.subnet_id.output
   network_security_group_id = module.network_security_group.network_security_group.output
