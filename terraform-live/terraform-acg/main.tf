@@ -9,6 +9,13 @@ locals {
   random_result = random_string.random.result
 }
 
+module "public_ip" {
+  source              = "../../terraform-modules/public-ip"
+  name                = "${local.random_result}public-ip"
+  resource_group_name = data.azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+}
+
 module "vnet" {
   source                = "../../terraform-modules/vnet"
   location              = data.azurerm_resource_group.rg.location
@@ -19,33 +26,11 @@ module "vnet" {
   subnet_address_prefix = "10.0.1.0/24"
 }
 
-module "acrsubnet" {
-  depends_on = [
-    module.vnet
-  ]
-  source                     = "../../terraform-modules/subnet"
-  name                       = "acrsubnet"
-  resource_group_name        = data.azurerm_resource_group.rg.name
-  virtual_network_name       = "${local.random_result}-vnet"
-  address_prefixes           = ["10.0.2.0/24"]
-  delegation_name            = "acidelegationservice"
-  service_delegation_name    = "Microsoft.ContainerInstance/containerGroups"
-  service_delegation_actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
-}
-
 module "network_security_group" {
   source              = "../../terraform-modules/nsg"
   name                = "${local.random_result}-nsg"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
-}
-
-output "subnet" {
-  value = module.acrsubnet
-}
-
-output "nsg" {
-  value = module.network_security_group.network_security_group
 }
 
 module "network_security_rule" {
@@ -63,40 +48,46 @@ module "network_security_rule" {
   source_port_range           = "*"
   destination_port_ranges     = [22, 443, 445, 3306, 8000, 9001]
   #source_address_prefixes      = ["0.0.0.0", "255.255.255.255"]
-  #destination_address_prefixes = module.acrsubnet.address_prefixes.output
+  #destination_address_prefixes = module.mysqlsubnet.address_prefixes.output
 }
 
-module "network_profile" {
+###################
+# MySql Container #
+###################
+module "mysqlsubnet" {
   depends_on = [
-    module.acrsubnet
+    module.vnet
+  ]
+  source                     = "../../terraform-modules/subnet"
+  name                       = "mysqlsubnet"
+  resource_group_name        = data.azurerm_resource_group.rg.name
+  virtual_network_name       = "${local.random_result}-vnet"
+  address_prefixes           = ["10.0.2.0/24"]
+  delegation_name            = "acidelegationservice"
+  service_delegation_name    = "Microsoft.ContainerInstance/containerGroups"
+  service_delegation_actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
+}
+
+module "mysql_network_profile" {
+  depends_on = [
+    module.mysqlsubnet
   ]
   source              = "../../terraform-modules/network-profile"
   name                = "${local.random_result}netprofile"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
-  subnet_id           = module.acrsubnet.subnet_id.output
+  subnet_id           = module.mysqlsubnet.subnet_id.output
 }
 
-module "subnet_network_security_group_association" {
+module "mysql_subnet_network_security_group_association" {
   depends_on = [
-    module.acrsubnet,
+    module.mysqlsubnet,
     module.network_security_group
   ]
   source                    = "../../terraform-modules/nsg-association"
-  subnet_id                 = module.acrsubnet.subnet_id.output
+  subnet_id                 = module.mysqlsubnet.subnet_id.output
   network_security_group_id = module.network_security_group.network_security_group.output
 }
-
-# output "name" {
-#   value = module.network_profile.id.output
-# }
-
-# module "public_ip" {
-#   source              = "../../terraform-modules/public-ip"
-#   name                = "${local.random_result}public-ip"
-#   resource_group_name = data.azurerm_resource_group.rg.name
-#   location            = data.azurerm_resource_group.rg.location
-# }
 
 resource "azurerm_container_group" "mysql" {
   name                = "mysqlacg"
@@ -111,7 +102,7 @@ resource "azurerm_container_group" "mysql" {
     server   = data.azurerm_container_registry.acr.login_server
   }
 
-  network_profile_id = module.network_profile.id.output
+  network_profile_id = module.mysql_network_profile.id.output
 
   container {
     name   = "mysql"
@@ -129,6 +120,44 @@ resource "azurerm_container_group" "mysql" {
   }
 }
 
+#################
+# API Container #
+#################
+
+module "apisubnet" {
+  depends_on = [
+    module.vnet
+  ]
+  source                     = "../../terraform-modules/subnet"
+  name                       = "apisubnet"
+  resource_group_name        = data.azurerm_resource_group.rg.name
+  virtual_network_name       = "${local.random_result}-vnet"
+  address_prefixes           = ["10.0.3.0/24"]
+  delegation_name            = "acidelegationservice"
+  service_delegation_name    = "Microsoft.ContainerInstance/containerGroups"
+  service_delegation_actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
+}
+
+module "api_network_profile" {
+  depends_on = [
+    module.mysqlsubnet
+  ]
+  source              = "../../terraform-modules/network-profile"
+  name                = "${local.random_result}netprofile"
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+  subnet_id           = module.mysqlsubnet.subnet_id.output
+}
+
+module "api_subnet_network_security_group_association" {
+  depends_on = [
+    module.apisubnet,
+    module.network_security_group
+  ]
+  source                    = "../../terraform-modules/nsg-association"
+  subnet_id                 = module.apisubnet.subnet_id.output
+  network_security_group_id = module.network_security_group.network_security_group.output
+}
 resource "azurerm_container_group" "api" {
   name                = "apiacg"
   location            = data.azurerm_resource_group.rg.location
@@ -136,7 +165,7 @@ resource "azurerm_container_group" "api" {
   ip_address_type     = "Private"
   os_type             = "Linux"
 
-  network_profile_id = module.network_profile.id.output
+  network_profile_id = module.api_network_profile.id.output
 
   image_registry_credential {
     username = data.azurerm_container_registry.acr.admin_username
@@ -166,3 +195,15 @@ resource "azurerm_container_group" "api" {
     environment = "testing"
   }
 }
+
+output "subnet" {
+  value = module.mysqlsubnet
+}
+
+output "nsg" {
+  value = module.network_security_group.network_security_group
+}
+
+# output "name" {
+#   value = module.network_profile.id.output
+# }

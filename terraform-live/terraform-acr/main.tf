@@ -111,7 +111,7 @@ module "acr" {
 
 
 # ACI_IP=$(az container show \
-#   --name efefef \
+#   --name apiacg \
 #   --resource-group "demo-containers-dev" \
 #   --query ipAddress.ip --output tsv)
 
@@ -122,9 +122,9 @@ module "acr" {
 #   --capacity 2 \
 #   --sku Standard_v2 \
 #   --http-settings-protocol http \
-#   --public-ip-address "zgcqabwnsg" \
-#   --vnet-name "zgcqabw-vnet" \
-#   --subnet "acgsubnet" \
-#   --servers "10.0.2.4" \
+#   --public-ip-address "myAGPublicIPAddress" \
+#   --vnet-name "lpfxiqc-vnet" \
+#   --subnet "default" \
+#   --servers "10.0.2.5" \
 #   --priority 200 \
 #   --routing-rule-type Basic
