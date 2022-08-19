@@ -9,8 +9,8 @@ resource "azurerm_network_security_rule" "network_security_rule" {
   source_port_range           = var.source_port_range
   destination_port_ranges     = var.destination_port_ranges
   #source_address_prefixes      = var.source_address_prefixes
-  source_address_prefix      = "*"
-  destination_address_prefix = "*"
+  source_address_prefix      = var.source_address_prefix      #"*"
+  destination_address_prefix = var.destination_address_prefix #"*"
   #destination_address_prefixes = var.destination_address_prefixes
 }
 
