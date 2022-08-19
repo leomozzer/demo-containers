@@ -170,7 +170,7 @@ stages:
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
         variables:
           acr_name: $[ dependencies.applyAcr.outputs['applyOutput.acr_name'] ] 
-        displayName: Build and Push NodeJS Api
+        displayName: Build and Push Website
         steps:
           
         - task: DockerCompose@0
@@ -179,12 +179,12 @@ stages:
             action: Build services
             azureSubscriptionEndpoint: ${{ variables.service_connection_name }}
             azureContainerRegistry: '$(acr_name).azurecr.io'
-            dockerComposeFile: api/docker-compose.yml
-            projectName: api-$(System.StageName)
+            dockerComposeFile: website/docker-compose.yml
+            projectName: website-$(System.StageName)
             qualifyImageNames: ${{ variables.qualify_image_names }}
             dockerComposeFileArgs: |
               BACKEND_ADDRESS=""
-              MYSQL_PORT=9001
+              BACKEND_PORT=9001
             
         - task: DockerCompose@0
           displayName: Push services
@@ -193,16 +193,16 @@ stages:
             containerregistrytype: Azure Container Registry
             azureSubscriptionEndpoint: ${{ variables.service_connection_name }}
             azureContainerRegistry: '$(acr_name).azurecr.io'
-            dockerComposeFile: api/docker-compose.yml
-            projectName: api-$(System.StageName)
+            dockerComposeFile: website/docker-compose.yml
+            projectName: website-$(System.StageName)
             qualifyImageNames: ${{ variables.qualify_image_names }}
             dockerComposeFileArgs: |
               BACKEND_ADDRESS=""
-              MYSQL_PORT=9001
+              BACKEND_PORT=9001
 
       - job: planAcg
         displayName: Terraform Plan ACG
-        dependsOn: [apibuildpush, applyAcr]
+        dependsOn: [webistebuildpush, applyAcr]
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
         variables:
           acr_name: $[ dependencies.applyAcr.outputs['applyOutput.acr_name'] ] 
