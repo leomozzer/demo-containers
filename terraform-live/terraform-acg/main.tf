@@ -61,7 +61,7 @@ module "network_security_rule" {
   access                      = "Allow"
   protocol                    = "Tcp"
   source_port_range           = "*"
-  destination_port_ranges     = [22, 443, 445, 3306, 8000]
+  destination_port_ranges     = [22, 443, 445, 3306, 8000, 9001]
   #source_address_prefixes      = ["0.0.0.0", "255.255.255.255"]
   #destination_address_prefixes = module.acrsubnet.address_prefixes.output
 }
@@ -133,8 +133,10 @@ resource "azurerm_container_group" "api" {
   name                = "apiacg"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
-  ip_address_type     = "Public"
+  ip_address_type     = "Private"
   os_type             = "Linux"
+
+  network_profile_id = module.network_profile.id.output
 
   image_registry_credential {
     username = data.azurerm_container_registry.acr.admin_username
