@@ -115,6 +115,10 @@ module "acr" {
 #   --resource-group "demo-containers-dev" \
 #   --query ipAddress.ip --output tsv)
 
+# api: 10.0.2.5
+# mysql: 10.0.2.4
+# website: 10.0.2.6
+
 # az network application-gateway create \
 #   --name myAppGateway \
 #   --location westeurope \
@@ -125,6 +129,6 @@ module "acr" {
 #   --public-ip-address "lpfxiqcpublic-ip" \
 #   --vnet-name "lpfxiqc-vnet" \
 #   --subnet "default" \
-#   --servers "10.0.2.5" \
+#   --servers "10.0.2.6" \
 #   --priority 200 \
 #   --routing-rule-type Basic

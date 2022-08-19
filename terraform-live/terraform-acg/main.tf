@@ -146,7 +146,7 @@ module "api_network_profile" {
   name                = "${local.random_result}netprofile"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
-  subnet_id           = module.mysqlsubnet.subnet_id.output
+  subnet_id           = module.apisubnet.subnet_id.output
 }
 
 module "api_subnet_network_security_group_association" {
