@@ -49,18 +49,18 @@ output "nsg" {
 }
 
 module "network_security_rule" {
-  source                       = "../../terraform-modules/network-security-rule"
-  name                         = "from-gateway-subnet"
-  resource_group_name          = data.azurerm_resource_group.rg.name
-  network_security_group_name  = "${local.random_result}-nsg"
-  priority                     = 100
-  direction                    = "Inbound"
-  access                       = "Allow"
-  protocol                     = "Tcp"
-  source_port_range            = "*"
-  destination_port_ranges      = [22, 443, 445, 3306, 8000]
-  source_address_prefixes      = ["0.0.0.0", "255.255.255.255"]
-  destination_address_prefixes = module.acrsubnet.address_prefixes.output
+  source                      = "../../terraform-modules/network-security-rule"
+  name                        = "from-gateway-subnet"
+  resource_group_name         = data.azurerm_resource_group.rg.name
+  network_security_group_name = "${local.random_result}-nsg"
+  priority                    = 100
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_ranges     = [22, 443, 445, 3306, 8000]
+  #source_address_prefixes      = ["0.0.0.0", "255.255.255.255"]
+  #destination_address_prefixes = module.acrsubnet.address_prefixes.output
 }
 
 module "network_profile" {
