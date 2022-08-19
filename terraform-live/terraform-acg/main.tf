@@ -234,7 +234,7 @@ module "api_subnet_network_security_group_association" {
   subnet_id                 = module.websitesubnet.subnet_id.output
   network_security_group_id = module.network_security_group.network_security_group.output
 }
-resource "azurerm_container_group" "api" {
+resource "azurerm_container_group" "webiste" {
   name                = "webisteacg"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
