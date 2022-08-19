@@ -165,6 +165,41 @@ stages:
               MYSQL_HOST=""
               MYSQL_PORT=3306
 
+      - job: webistebuildpush
+        dependsOn: [applyAcr]
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+        variables:
+          acr_name: $[ dependencies.applyAcr.outputs['applyOutput.acr_name'] ] 
+        displayName: Build and Push NodeJS Api
+        steps:
+          
+        - task: DockerCompose@0
+          displayName: Build services
+          inputs:
+            action: Build services
+            azureSubscriptionEndpoint: ${{ variables.service_connection_name }}
+            azureContainerRegistry: '$(acr_name).azurecr.io'
+            dockerComposeFile: api/docker-compose.yml
+            projectName: api-$(System.StageName)
+            qualifyImageNames: ${{ variables.qualify_image_names }}
+            dockerComposeFileArgs: |
+              BACKEND_ADDRESS=""
+              MYSQL_PORT=9001
+            
+        - task: DockerCompose@0
+          displayName: Push services
+          inputs:
+            action: Push services
+            containerregistrytype: Azure Container Registry
+            azureSubscriptionEndpoint: ${{ variables.service_connection_name }}
+            azureContainerRegistry: '$(acr_name).azurecr.io'
+            dockerComposeFile: api/docker-compose.yml
+            projectName: api-$(System.StageName)
+            qualifyImageNames: ${{ variables.qualify_image_names }}
+            dockerComposeFileArgs: |
+              BACKEND_ADDRESS=""
+              MYSQL_PORT=9001
+
       - job: planAcg
         displayName: Terraform Plan ACG
         dependsOn: [apibuildpush, applyAcr]

@@ -122,7 +122,7 @@ module "acr" {
 #   --capacity 2 \
 #   --sku Standard_v2 \
 #   --http-settings-protocol http \
-#   --public-ip-address "myAGPublicIPAddress" \
+#   --public-ip-address "lpfxiqcpublic-ip" \
 #   --vnet-name "lpfxiqc-vnet" \
 #   --subnet "default" \
 #   --servers "10.0.2.5" \
