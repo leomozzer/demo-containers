@@ -208,13 +208,13 @@ module "websitesubnet" {
   name                       = "websitesubnet"
   resource_group_name        = data.azurerm_resource_group.rg.name
   virtual_network_name       = "${local.random_result}-vnet"
-  address_prefixes           = ["10.0.3.0/24"]
+  address_prefixes           = ["10.0.4.0/24"]
   delegation_name            = "acidelegationservice"
   service_delegation_name    = "Microsoft.ContainerInstance/containerGroups"
   service_delegation_actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
 }
 
-module "api_network_profile" {
+module "website_network_profile" {
   depends_on = [
     module.mysqlsubnet
   ]
@@ -222,10 +222,10 @@ module "api_network_profile" {
   name                = "${local.random_result}netprofile"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
-  subnet_id           = module.mysqlsubnet.subnet_id.output
+  subnet_id           = module.websitesubnet.subnet_id.output
 }
 
-module "api_subnet_network_security_group_association" {
+module "website_subnet_network_security_group_association" {
   depends_on = [
     module.websitesubnet,
     module.network_security_group
@@ -241,7 +241,7 @@ resource "azurerm_container_group" "webiste" {
   ip_address_type     = "Private"
   os_type             = "Linux"
 
-  network_profile_id = module.api_network_profile.id.output
+  network_profile_id = module.website_network_profile.id.output
 
   image_registry_credential {
     username = data.azurerm_container_registry.acr.admin_username
