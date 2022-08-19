@@ -126,9 +126,9 @@ module "acr" {
 #   --capacity 2 \
 #   --sku Standard_v2 \
 #   --http-settings-protocol http \
-#   --public-ip-address "lpfxiqcpublic-ip" \
-#   --vnet-name "lpfxiqc-vnet" \
+#   --public-ip-address "bqjbnrmpublic-ip" \
+#   --vnet-name "bqjbnrm-vnet" \
 #   --subnet "default" \
-#   --servers "10.0.2.6" \
+#   --servers "10.0.4.6" \
 #   --priority 200 \
 #   --routing-rule-type Basic

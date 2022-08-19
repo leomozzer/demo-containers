@@ -19,20 +19,14 @@ app.get('/', (req, res) => {
   })
 })
 
-try {
-  console.log(`Connecting to the MySql on ${process.env.MYSQL_HOST}`)
-  const connection = mysql.createConnection({
-    host: process.env.MYSQL_HOST ? process.env.MYSQL_HOST : 'mysql',
-    user: 'root',
-    password: 'skaylink',
-    database: 'skaylinkbr',
-    port: process.env.MYSQL_PORT ? process.env.MYSQL_PORT : 3306
-  });
-
-  connection.connect();
-} catch (error) {
-  console.log(error)
-}
+console.log(`Connecting to the MySql on ${process.env.MYSQL_HOST}`)
+const connection = mysql.createConnection({
+  host: process.env.MYSQL_HOST ? process.env.MYSQL_HOST : 'mysql',
+  user: 'root',
+  password: 'skaylink',
+  database: 'skaylinkbr',
+  port: process.env.MYSQL_PORT ? process.env.MYSQL_PORT : 3306
+});
 
 app.get('/people', function (req, res) {
   try {
