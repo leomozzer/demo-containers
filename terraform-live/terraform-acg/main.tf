@@ -130,7 +130,8 @@ resource "azurerm_container_group" "mysql" {
 module "api_network_security_rule" {
   depends_on = [
     module.network_security_group,
-    module.websitesubnet
+    module.app_gateway
+    #module.websitesubnet
   ]
   source                      = "../../terraform-modules/network-security-rule"
   name                        = "api-rule" #"from-gateway-subnet"
@@ -144,7 +145,7 @@ module "api_network_security_rule" {
   destination_port_ranges     = [9001] #[22, 80, 443, 445, 3306, 8000, 9001]
   #source_address_prefixes      = ["0.0.0.0", "255.255.255.255"]
   #destination_address_prefixes = module.mysqlsubnet.address_prefixes.output
-  source_address_prefixes      = module.websitesubnet.address_prefixes.output
+  source_address_prefixes      = module.app_gateway.address_prefixes.output #module.websitesubnet.address_prefixes.output
   destination_address_prefixes = module.apisubnet.address_prefixes.output
 }
 
@@ -241,7 +242,7 @@ module "website_network_security_rule" {
   #source_address_prefixes      = ["0.0.0.0", "255.255.255.255"]
   #destination_address_prefixes = module.mysqlsubnet.address_prefixes.output
   source_address_prefixes      = [module.public_ip.public_ip.output]
-  destination_address_prefixes = module.websitesubnet.address_prefixes.output
+  destination_address_prefixes = module.app_gateway.address_prefixes.output #module.websitesubnet.address_prefixes.output
 }
 
 resource "azurerm_network_security_rule" "appgateway_network_security_rule" {
@@ -259,38 +260,42 @@ resource "azurerm_network_security_rule" "appgateway_network_security_rule" {
 }
 
 
-module "websitesubnet" {
-  depends_on = [
-    module.vnet
-  ]
-  source                     = "../../terraform-modules/subnet"
-  name                       = "websitesubnet"
-  resource_group_name        = data.azurerm_resource_group.rg.name
-  virtual_network_name       = "${local.random_result}-vnet"
-  address_prefixes           = ["10.0.4.0/24"]
-  delegation_name            = "acidelegationservice"
-  service_delegation_name    = "Microsoft.ContainerInstance/containerGroups"
-  service_delegation_actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
-}
+### websitesubnet was changed to frontend subnet
+## Check app gateway module
+# module "websitesubnet" {
+#   depends_on = [
+#     module.vnet
+#   ]
+#   source                     = "../../terraform-modules/subnet"
+#   name                       = "websitesubnet"
+#   resource_group_name        = data.azurerm_resource_group.rg.name
+#   virtual_network_name       = "${local.random_result}-vnet"
+#   address_prefixes           = ["10.0.4.0/24"]
+#   delegation_name            = "acidelegationservice"
+#   service_delegation_name    = "Microsoft.ContainerInstance/containerGroups"
+#   service_delegation_actions = ["Microsoft.Network/virtualNetworks/subnets/join/action", "Microsoft.Network/virtualNetworks/subnets/prepareNetworkPolicies/action"]
+# }
 
 module "website_network_profile" {
   depends_on = [
+    #module.appgateway
     module.mysqlsubnet
   ]
   source              = "../../terraform-modules/network-profile"
   name                = "website${random_string.random.result}netprofile"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
-  subnet_id           = module.websitesubnet.subnet_id.output
+  subnet_id           = module.app_gateway.subnet_id.output #module.websitesubnet.subnet_id.output
 }
 
 module "website_subnet_network_security_group_association" {
   depends_on = [
-    module.websitesubnet,
+    #module.websitesubnet,
+    module.app_gateway,
     module.network_security_group
   ]
   source                    = "../../terraform-modules/nsg-association"
-  subnet_id                 = module.websitesubnet.subnet_id.output
+  subnet_id                 = module.app_gateway.subnet_id.output #module.websitesubnet.subnet_id.output
   network_security_group_id = module.network_security_group.network_security_group.output
 }
 resource "azurerm_container_group" "webiste" {
@@ -348,7 +353,6 @@ module "app_gateway" {
   sku_tier                                       = "Standard_v2"
   sku_capacity                                   = 2
   gateway_ip_configuration_name                  = "my-gateway-ip-configuration"
-  gateway_ip_configuration_subnet_id             = "/subscriptions/955daeae-7823-41f8-a648-a19777bcb4ef/resourceGroups/demo-containers-dev/providers/Microsoft.Network/virtualNetworks/bqjbnrm-vnet/subnets/default" #module.websitesubnet.subnet_id.output
   frontend_port_name                             = "feport"
   frontend_port                                  = 80
   frontend_ip_configuration_name                 = "feip"
@@ -370,6 +374,7 @@ module "app_gateway" {
   request_routing_backend_address_pool_name      = "beap"
   request_routing_backend_http_settings_name     = "be-htst"
   request_routing_rule_priority                  = 1000
+  address_prefixes                               = ["10.0.4.0/24"]
 }
 
 # az network application-gateway create \
