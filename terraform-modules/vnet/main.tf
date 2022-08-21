@@ -9,4 +9,10 @@ resource "azurerm_virtual_network" "vnet" {
     name           = "default" #acgsubnet
     address_prefix = var.subnet_address_prefix
   }
+
+  lifecycle {
+    ignore_changes = [
+      subnet
+    ]
+  }
 }
