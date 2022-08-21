@@ -1,3 +1,9 @@
+resource "azurerm_subnet" "frontend" {
+  name                 = "frontend"
+  resource_group_name  = var.resource_group_name
+  virtual_network_name = var.virtual_network_name
+  address_prefixes     = var.address_prefixes
+}
 
 resource "azurerm_application_gateway" "network" {
   name                = var.name                # "example-appgateway"
@@ -11,8 +17,8 @@ resource "azurerm_application_gateway" "network" {
   }
 
   gateway_ip_configuration {
-    name      = var.gateway_ip_configuration_name      #"my-gateway-ip-configuration"
-    subnet_id = var.gateway_ip_configuration_subnet_id #azurerm_subnet.frontend.id
+    name      = var.gateway_ip_configuration_name #"my-gateway-ip-configuration"
+    subnet_id = azurerm_subnet.frontend.id        #var.gateway_ip_configuration_subnet_id 
   }
 
   frontend_port {

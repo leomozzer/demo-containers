@@ -2,12 +2,20 @@ variable "name" {
   type = string
 }
 
+variable "virtual_network_name" {
+  type = string
+}
+
 variable "resource_group_name" {
   type = string
 }
 
 variable "location" {
   type = string
+}
+
+variable "address_prefixes" {
+  type = list(string)
 }
 
 variable "sku_name" {
@@ -26,9 +34,9 @@ variable "sku_capacity" {
 variable "gateway_ip_configuration_name" {
   type = string
 }
-variable "gateway_ip_configuration_subnet_id" {
-  type = string
-}
+# variable "gateway_ip_configuration_subnet_id" {
+#   type = string
+# }
 
 variable "frontend_port_name" {
   type = string
