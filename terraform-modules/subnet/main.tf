@@ -11,4 +11,10 @@ resource "azurerm_subnet" "subnet" {
       actions = var.service_delegation_actions
     }
   }
+
+  lifecycle {
+    ignore_changes = [
+      delegation
+    ]
+  }
 }
