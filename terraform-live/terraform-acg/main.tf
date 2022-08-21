@@ -222,7 +222,7 @@ resource "azurerm_container_group" "api" {
 
 #####################
 # Website Container #
-#################
+#####################
 module "website_network_security_rule" {
   depends_on = [
     module.network_security_group,
@@ -243,6 +243,22 @@ module "website_network_security_rule" {
   source_address_prefixes      = [module.public_ip.public_ip.output]
   destination_address_prefixes = module.websitesubnet.address_prefixes.output
 }
+
+resource "azurerm_network_security_rule" "appgateway_network_security_rule" {
+  name                        = "appgateway-rule"
+  resource_group_name         = data.azurerm_resource_group.rg.name
+  network_security_group_name = "${local.random_result}-nsg"
+  priority                    = 4096
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "*"
+  source_port_range           = "*"
+  destination_port_range      = "65200 - 65535"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+}
+
+
 module "websitesubnet" {
   depends_on = [
     module.vnet
@@ -315,6 +331,47 @@ resource "azurerm_container_group" "webiste" {
   }
 }
 
+
+###############
+# App Gateway #
+###############
+
+module "app_gateway" {
+  depends_on = [
+    azurerm_network_security_rule.appgateway_network_security_rule
+  ]
+  source                                         = "../../terraform-modules/app-gateway"
+  name                                           = "${random_string.random.result}appgateway"
+  resource_group_name                            = data.azurerm_resource_group.rg.name
+  location                                       = data.azurerm_resource_group.rg.location
+  sku_name                                       = "Standard_v2"
+  sku_tier                                       = "Standard_v2"
+  sku_capacity                                   = 2
+  gateway_ip_configuration_name                  = "my-gateway-ip-configuration"
+  gateway_ip_configuration_subnet_id             = "/subscriptions/955daeae-7823-41f8-a648-a19777bcb4ef/resourceGroups/demo-containers-dev/providers/Microsoft.Network/virtualNetworks/bqjbnrm-vnet/subnets/default" #module.websitesubnet.subnet_id.output
+  frontend_port_name                             = "feport"
+  frontend_port                                  = 80
+  frontend_ip_configuration_name                 = "feip"
+  frontend_ip_configuration_public_ip_address_id = module.public_ip.id.output
+  backend_address_pool_name                      = "beap"
+  backend_http_settings_name                     = "be-htst"
+  backend_http_settings_cookie_based_affinity    = "Disabled"
+  backend_http_settings_path                     = "/"
+  backend_http_settings_port                     = 80
+  backend_http_settings_protocol                 = "Http"
+  backend_http_settings_request_timeout          = 60
+  http_listener_name                             = "httplstn"
+  http_listener_frontend_ip_configuration_name   = "feip"
+  http_listener_frontend_port_name               = "feport"
+  http_listener_protocol                         = "Http"
+  request_routing_rule_name                      = "rqrt"
+  request_routing_rule_type                      = "Basic"
+  request_routing_http_listener_name             = "httplstn"
+  request_routing_backend_address_pool_name      = "beap"
+  request_routing_backend_http_settings_name     = "be-htst"
+  request_routing_rule_priority                  = 1000
+}
+
 # az network application-gateway create \
 #   --name myAppGateway \
 #   --location westeurope \
@@ -331,6 +388,10 @@ resource "azurerm_container_group" "webiste" {
 
 output "subnet" {
   value = module.mysqlsubnet
+}
+
+output "subnet1" {
+  value = module.vnet.subnet
 }
 
 output "nsg" {
