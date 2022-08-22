@@ -46,7 +46,7 @@ module "mysql_network_security_rule" {
   name                        = "mysql-rule" #"from-gateway-subnet"
   resource_group_name         = data.azurerm_resource_group.rg.name
   network_security_group_name = "${local.random_result}-nsg"
-  priority                    = 300
+  priority                    = 3300
   direction                   = "Inbound"
   access                      = "Allow"
   protocol                    = "Tcp"
@@ -137,7 +137,7 @@ module "api_network_security_rule" {
   name                        = "api-rule" #"from-gateway-subnet"
   resource_group_name         = data.azurerm_resource_group.rg.name
   network_security_group_name = "${local.random_result}-nsg"
-  priority                    = 200
+  priority                    = 3200
   direction                   = "Inbound"
   access                      = "Allow"
   protocol                    = "Tcp"
@@ -233,7 +233,7 @@ module "website_network_security_rule" {
   name                        = "website-rule" #"from-gateway-subnet"
   resource_group_name         = data.azurerm_resource_group.rg.name
   network_security_group_name = "${local.random_result}-nsg"
-  priority                    = 100
+  priority                    = 3100
   direction                   = "Inbound"
   access                      = "Allow"
   protocol                    = "Tcp"
