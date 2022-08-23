@@ -58,6 +58,10 @@ variable "backend_address_pool_name" {
   type = string
 }
 
+variable "backend_address_pool_ip_addresses" {
+  type = list(string)
+}
+
 variable "backend_http_settings_name" {
   type = string
 }
