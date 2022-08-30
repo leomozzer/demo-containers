@@ -347,7 +347,8 @@ resource "azurerm_container_group" "webiste" {
 #https://stackoverflow.com/questions/71962753/502-bad-gateway-from-azure-application-gateway-connecting-to-azure-container-ins
 module "app_gateway" {
   depends_on = [
-    azurerm_network_security_rule.appgateway_network_security_rule
+    azurerm_network_security_rule.appgateway_network_security_rule,
+    azurerm_network_security_rule.network_security_rule
   ]
   source                                         = "../../terraform-modules/app-gateway"
   name                                           = "${random_string.random.result}appgateway"
