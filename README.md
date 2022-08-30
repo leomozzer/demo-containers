@@ -78,115 +78,79 @@ docker-compose down
 ```
 -----------------------------------------------------------
 ## Terraform
-
-### Backend
-* Create a new file called `variables.tfvars` in the terraform/backend folder
-* Add the values below in the new file
-```
-#Account
-subscription_id = ""
-client_id       = ""
-client_secret   = ""
-tenant_id       = ""
-
-#App
-environment = "dev"
-app_name    = "demo-containers"
-```
-* Use the commands below:
+- run the `az login` 
+- `demo-containers/terraform-live/terraform-acr` will create the Azure Container Registry to place the db, api and website docker images
+- `demo-containers/terraform-live/terraform-acg` will create the public ip, nsg, vnet, subnets, container group (instance) and application gateway
+### terraform-acr
 ```
 terraform init
-terraform plan -var-file="variables.tfvars" -out=main.plan
-terraform apply -auto-approve main.plan
+terraform plan -var-file "../dev.tfvars" -out "dev.plan"
+terraform apply "dev.plan"
+terraform destroy -var-file "../dev.tfvars"
 ```
-
-## Docker Compose and Azure Manually
-* [Deploy a multi-container group using Docker Compose](https://docs.microsoft.com/en-us/azure/container-instances/tutorial-docker-compose)
-* Use the terraform/backend to create the Azure Container Registry (ACR)
-* Get the credentials of the ACR
-* Use the command `docker login <acrName>.azurecr.io` and provide the username and password
-* az acr login --name <acrName>
+- Get the crendentials of the ACR and run the `az acr login --name <acrName>`
 ### mysql
 * docker-compose up --build -d
 * docker-compose down
 * docker-compose push
-* Create a container instance to MySql
-    * Use the port 3306
-* Open the Container instance of the mysql
-* connect to it and run the command in the mysql
 ### api
-* Get the ip address in of the ACI mysql
-* Add in the api connect mysql
 * Create a container instance to api
     * Use the port 9001
 * docker-compose up --build -d
 * docker-compose down
 * docker-compose push
+### webiste
+* Create a container instance to website
+    * Use the port 8888
+* docker-compose up --build -d
+* docker-compose down
+* docker-compose push
 
-* https://docs.microsoft.com/pt-br/azure/app-service/tutorial-multi-container-app
-
-## Docker Compose and Azure Pipeline
-
-### Configuration
-* Create a new service connection with the `Azure Resource Manager` in the subscription level
-* Access it and create a new client secret (save the info)
-* Access the subscription where the service connection has access
-* In the `Access control` attach the following permissions with the recently created service connection
+### terraform-acg
 ```
-AcrImageSigner
-AcrPull
-AcrPush
-Contributor
-Storage Account Contributor
-```
-* Create a resource group
-* Create an storage account and a container in the resource group
-* Create an key vault in the resource group
-* Add the following secrets in the key vault
-```
-CLIENT-ID
-CLIENT-SECRET
-STORAGE-ACCOUNT-CONTAINER
-STORAGE-ACCOUNT-KEY
-STORAGE-ACCOUNT-NAME
-SUBSCRIPTION-ID
-TENANT-ID
-```
-* Access the `Library` in the `Pipelines`
-* Create a new variables group called `demo-containers-group`
-* Enable the `Link secrets from an Azure Key Vault as variables`
-* Use the recently key vault created
-* Attach the secrets that were created
-
-
-### Backend pipeline
-* Create a new Azure pipeline using the `pipelines/backend/azure-pipelines.yml`
-* Run the pipeline and allow it to access the items needed
-* Get the credentials of the ACR that was created
-
-### App pipeline
-* Access the `Library` in the `Pipelines`
-* Create a new variables group called `demo-containers-acr-group`
-* Add the following variables
-```
-acr-admin-password -> value of the password of the ACR
-acr-name -> value of the user of the ACR
-```
-* Create a new pipeline using the `pipelines/app/azure-pipelines.yml`
-* Run the pipeline and allow it to access the items needed
-
-
-######
-
-
-- in terraform-acr
-```
+terraform init
 terraform plan -var-file "../dev.tfvars" -out "dev.plan"
+#add the name of the ACR
 terraform apply "dev.plan"
 terraform destroy -var-file "../dev.tfvars"
 ```
 
-https://docs.microsoft.com/en-us/azure/container-instances/container-instances-application-gateway
-https://truestorydavestorey.medium.com/how-to-get-an-azure-container-instance-running-inside-a-vnet-with-a-fileshare-mount-using-terraform-a12f5b2b86ce
+## Pipeline
+- ServicePrincipal with access to the Subscription level
+- Use the `azure-pipelines.yaml`
+  - Stage QualityCheckStage will perform the verification in the tf files using the tfsec container and run the Trivy command to check vulnerabilities in the docker files
+  - planAcr and applyAcr will plan and create the ACR resource in the RG. Also a separeated resource group will be create to store the tf state files check [azure-setup.yam](./pipelines/templates/steps/azure-setup.yaml)
+  - Using the terraform output, the name of the ACR will be collected and saved as a variable
+  - The mysql, api and website images will be built and pushed
+  - planAcg and applyAcg will create the nsg, vnet, subnet, acg with the container images, public ip and application gateway
+- After the mysql ACG was created, connect on it and run the commands
+```
+mysql -uroot -pskaylink
+CREATE DATABASE IF NOT EXISTS skaylinkbr;
+USE skaylinkbr;
 
-Try with: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mysql_database
+CREATE TABLE IF NOT EXISTS people (
+  id INT(11) AUTO_INCREMENT,
+  full_name VARCHAR(255),
+  email VARCHAR(255),
+  title VARCHAR(100),
+  location_name VARCHAR(100),    
+  PRIMARY KEY (id)
+);
+
+INSERT INTO people VALUE(0, 'Luningning Ingmar', 'luningning.ingmar@contoso.com', '', '');
+INSERT INTO people VALUE(0, 'Matty Finn', '', '', '');
+INSERT INTO people VALUE(0, 'Laura Jef', '', 'Support Specialist', '');
+INSERT INTO people VALUE(0, 'Lise Sesto', '', '', '');
+INSERT INTO people VALUE(0, 'Hartwin Aang',  '', 'Support Specialist', 'Springfield');
+INSERT INTO people VALUE(0, 'Aldegund Lena', 'aldegund.lena@contoso.com', '', '');
+INSERT INTO people VALUE(0, 'Gabrijel Torcull', '', 'IT Support Coordinator', 'Springfield');
+INSERT INTO people VALUE(0, 'Cathalán Toufik', 'cathalan.toufik@contoso.com', '', '');
+```
+- Access the ip from the public ip
+
+## Links used:
+
+- https://docs.microsoft.com/en-us/azure/container-instances/container-instances-application-gateway
+- https://truestorydavestorey.medium.com/how-to-get-an-azure-container-instance-running-inside-a-vnet-with-a-fileshare-mount-using-terraform-a12f5b2b86ce
+- https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mysql_database
