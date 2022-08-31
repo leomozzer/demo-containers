@@ -238,6 +238,9 @@ module "website_network_security_rule" {
 }
 
 resource "azurerm_network_security_rule" "network_security_rule" {
+  depends_on = [
+    module.network_security_group
+  ]
   name                        = "to-internet"
   resource_group_name         = data.azurerm_resource_group.rg.name
   network_security_group_name = "${local.random_result}-nsg"
