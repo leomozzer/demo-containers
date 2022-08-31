@@ -147,7 +147,9 @@ INSERT INTO people VALUE(0, 'Aldegund Lena', 'aldegund.lena@contoso.com', '', ''
 INSERT INTO people VALUE(0, 'Gabrijel Torcull', '', 'IT Support Coordinator', 'Springfield');
 INSERT INTO people VALUE(0, 'Cathalán Toufik', 'cathalan.toufik@contoso.com', '', '');
 ```
-- Access the ip from the public ip
+- Access the app from the public ip
+## Diagram
+![diagram](./documentation/images/pipeline-diagram.png)
 
 ## Links used:
 
