@@ -1,29 +1,31 @@
-version : '3'
+version: '3'
 services:
   mysql:
     image: mysql
     container_name: mysql-container
-    build: 
+    build:
       context: ./db
       dockerfile: Dockerfile
+    command: --init-file /data/application/init.sql
     volumes:
-       - "./db/data:/var/lib/mysql"
-       - "./db/scripts:/docker-entrypoint-initdb.d"
+      - "./db/data:/var/lib/mysql"
+      - "./db/scripts:/docker-entrypoint-initdb.d"
+      - ./init.sql:/data/application/init.sql
     ports:
-       - 3306:3306
+      - 3306:3306
 
   api:
     image: api
     container_name: api-container
-    build: 
+    build:
       context: ./api
       dockerfile: Dockerfile
       args:
         - MYSQL_HOST="mysql"
     volumes:
-       - "./api:/home/node/app"
+      - "./api:/home/node/app"
     ports:
-       - 9001:9001
+      - 9001:9001
     environment:
       MYSQL_HOST: "mysql"
     restart: "always"
@@ -33,16 +35,16 @@ services:
   website:
     image: website
     container_name: website-container
-    build: 
+    build:
       context: ./website
       dockerfile: Dockerfile
       args:
         - BACKEND_ADDRESS="api"
         - BACKEND_PORT=9001
     volumes:
-       - "./website:/var/www/html"
+      - "./website:/var/www/html"
     ports:
-       - 8888:80
+      - 8888:80
     restart: "always"
     depends_on:
       - "api"

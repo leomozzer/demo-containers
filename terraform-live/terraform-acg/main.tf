@@ -128,7 +128,6 @@ resource "azurerm_container_group" "mysql" {
 module "api_network_security_rule" {
   depends_on = [
     module.network_security_group,
-    #module.app_gateway
     module.websitesubnet
   ]
   source                       = "../../terraform-modules/network-security-rule"
@@ -348,70 +347,56 @@ resource "azurerm_container_group" "webiste" {
 ###############
 
 #https://stackoverflow.com/questions/71962753/502-bad-gateway-from-azure-application-gateway-connecting-to-azure-container-ins
-module "app_gateway" {
-  depends_on = [
-    azurerm_network_security_rule.appgateway_network_security_rule,
-    azurerm_network_security_rule.network_security_rule
-  ]
-  source                                         = "../../terraform-modules/app-gateway"
-  name                                           = "${random_string.random.result}appgateway"
-  resource_group_name                            = data.azurerm_resource_group.rg.name
-  location                                       = data.azurerm_resource_group.rg.location
-  sku_name                                       = "Standard_v2"
-  sku_tier                                       = "Standard_v2"
-  sku_capacity                                   = 2
-  gateway_ip_configuration_name                  = "my-gateway-ip-configuration"
-  frontend_port_name                             = "feport"
-  frontend_port                                  = 80
-  frontend_ip_configuration_name                 = "feip"
-  frontend_ip_configuration_public_ip_address_id = module.public_ip.id.output
-  backend_address_pool_name                      = "beap"
-  backend_http_settings_name                     = "be-htst"
-  backend_http_settings_cookie_based_affinity    = "Disabled"
-  backend_http_settings_path                     = "/"
-  backend_http_settings_port                     = 80
-  backend_http_settings_protocol                 = "Http"
-  backend_http_settings_request_timeout          = 60
-  http_listener_name                             = "httplstn"
-  http_listener_frontend_ip_configuration_name   = "feip"
-  http_listener_frontend_port_name               = "feport"
-  http_listener_protocol                         = "Http"
-  request_routing_rule_name                      = "rqrt"
-  request_routing_rule_type                      = "Basic"
-  request_routing_http_listener_name             = "httplstn"
-  request_routing_backend_address_pool_name      = "beap"
-  request_routing_backend_http_settings_name     = "be-htst"
-  request_routing_rule_priority                  = 1000
-  address_prefixes                               = ["10.0.5.0/24"]
-  virtual_network_name                           = "${local.random_result}-vnet"
-  backend_address_pool_ip_addresses              = [azurerm_container_group.webiste.ip_address]
-}
+# module "app_gateway" {
+#   depends_on = [
+#     azurerm_network_security_rule.appgateway_network_security_rule,
+#     azurerm_network_security_rule.network_security_rule
+#   ]
+#   source                                         = "../../terraform-modules/app-gateway"
+#   name                                           = "${random_string.random.result}appgateway"
+#   resource_group_name                            = data.azurerm_resource_group.rg.name
+#   location                                       = data.azurerm_resource_group.rg.location
+#   sku_name                                       = "Standard_v2"
+#   sku_tier                                       = "Standard_v2"
+#   sku_capacity                                   = 2
+#   gateway_ip_configuration_name                  = "my-gateway-ip-configuration"
+#   frontend_port_name                             = "feport"
+#   frontend_port                                  = 80
+#   frontend_ip_configuration_name                 = "feip"
+#   frontend_ip_configuration_public_ip_address_id = module.public_ip.id.output
+#   backend_address_pool_name                      = "beap"
+#   backend_http_settings_name                     = "be-htst"
+#   backend_http_settings_cookie_based_affinity    = "Disabled"
+#   backend_http_settings_path                     = "/"
+#   backend_http_settings_port                     = 80
+#   backend_http_settings_protocol                 = "Http"
+#   backend_http_settings_request_timeout          = 60
+#   http_listener_name                             = "httplstn"
+#   http_listener_frontend_ip_configuration_name   = "feip"
+#   http_listener_frontend_port_name               = "feport"
+#   http_listener_protocol                         = "Http"
+#   request_routing_rule_name                      = "rqrt"
+#   request_routing_rule_type                      = "Basic"
+#   request_routing_http_listener_name             = "httplstn"
+#   request_routing_backend_address_pool_name      = "beap"
+#   request_routing_backend_http_settings_name     = "be-htst"
+#   request_routing_rule_priority                  = 1000
+#   address_prefixes                               = ["10.0.5.0/24"]
+#   virtual_network_name                           = "${local.random_result}-vnet"
+#   backend_address_pool_ip_addresses              = [azurerm_container_group.webiste.ip_address]
+# }
 
-# az network application-gateway create \
-#   --name myAppGateway \
-#   --location westeurope \
-#   --resource-group "demo-containers-dev" \
-#   --capacity 2 \
-#   --sku Standard_v2 \
-#   --http-settings-protocol http \
-#   --public-ip-address "bqjbnrmpublic-ip" \
-#   --vnet-name "bqjbnrm-vnet" \
-#   --subnet "default" \
-#   --servers "10.0.4.4" \
-#   --priority 200 \
-#   --routing-rule-type Basic
+# output "subnet" {
+#   value = module.mysqlsubnet
+# }
 
-output "subnet" {
-  value = module.mysqlsubnet
-}
+# output "subnet1" {
+#   value = module.vnet.subnet
+# }
 
-output "subnet1" {
-  value = module.vnet.subnet
-}
-
-output "nsg" {
-  value = module.network_security_group.network_security_group
-}
+# output "nsg" {
+#   value = module.network_security_group.network_security_group
+# }
 
 # output "name" {
 #   value = module.network_profile.id.output
