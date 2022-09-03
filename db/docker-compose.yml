@@ -9,7 +9,10 @@ services:
     command: --init-file /data/application/init.sql
     volumes:
       - "./db/data:/var/lib/mysql"
-      - "./db/scripts:/docker-entrypoint-initdb.d"
-      - ./init.sql:/data/application/init.sql
+      #- "./db/scripts:/docker-entrypoint-initdb.d"
+      - "./db/init.sql:/data/application/init.sql"
     ports:
       - 3306:3306
+    environment:
+      - MYSQL_DATABASE=skaylinkbr
+      - MYSQL_ROOT_PASSWORD=skaylink
